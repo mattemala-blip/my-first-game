@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+:root { color-scheme: dark; font-family: system-ui, sans-serif; }
+body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at top, #30204e, #111423 75%); color: #f7f0ff; display: grid; place-items: center; }
+main { width: min(1040px, 94vw); padding: 32px 0; text-align: center; }
+.badge { color: #bba0ff; font-size: 11px; font-weight: 800; letter-spacing: 3px; }
+h1 { font-size: clamp(36px, 6vw, 60px); margin: 8px 0; letter-spacing: -3px; }
+h1 span { color: #7ef3c1; }
+header p { color: #afa8c3; margin: 0 0 24px; }
+.game { position: relative; overflow: hidden; border: 1px solid #675581; border-radius: 20px; box-shadow: 0 24px 80px #0008; background: #19273d; }
+.hud { position: absolute; inset: 18px 24px auto; display: flex; justify-content: space-between; z-index: 1; pointer-events: none; text-align: left; color: #ddd0f5; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 2px 4px #000; }
+.hud strong { display: block; color: white; font-size: 25px; letter-spacing: 0; }
+.hud div:nth-child(2) strong { color: #ffdc7c; }
+canvas { display: block; width: 100%; touch-action: manipulation; outline-offset: -4px; }
+.overlay { position: absolute; inset: 0; background: #12172c80; display: grid; place-items: center; z-index: 2; backdrop-filter: blur(4px); }
+.overlay[hidden] { display: none; }
+.card { padding: 20px; }
+.icon { font-size: 38px; color: #ffdc7c; }
+h2 { margin: 8px 0; font-size: clamp(22px, 4vw, 36px); letter-spacing: -1px; }
+.card p { color: #e0d4ef; line-height: 1.6; margin: 12px 0 20px; }
+button { background: #7ef3c1; color: #16312d; border: 0; border-radius: 12px; padding: 14px 32px; font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #3a967b; }
+button:hover { background: #abffda; }
+button:focus-visible { outline: 3px solid white; outline-offset: 5px; }
+small { display: block; margin-top: 20px; color: #bcb2cf; font-size: 10px; letter-spacing: 2px; }
+footer { display: flex; justify-content: space-between; gap: 12px; padding: 20px 8px; font-size: 12px; color: #c1b2d4; }
+.hint { font-size: 12px; color: #887e9d; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 600px) { main { padding: 18px 0; } footer { flex-wrap: wrap; justify-content: center; } canvas { min-height: 320px; object-fit: fill; } .hud { inset: 14px 16px auto; } .card p { font-size: 13px; } }

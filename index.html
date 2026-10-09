@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rune Runner — One More Quest</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><div class="badge">✦ A TINY ENDLESS ADVENTURE</div><h1>Rune<span>Runner</span></h1><p>One brave mage. An endless forest. One more quest.</p></header>
+    <section class="game" aria-label="Rune Runner game">
+      <div class="hud"><div>QUEST SCORE<strong id="score">0</strong></div><div>GOLD<strong id="gold">0</strong></div><div>BEST<strong id="best">0</strong></div></div>
+      <canvas id="world" width="960" height="480" aria-label="A mage running through a magical forest. Jump over crystals and slimes." tabindex="0"></canvas>
+      <div class="overlay" id="overlay"><div class="card"><div class="icon">✦</div><h2 id="title">Your quest awaits</h2><p id="message">Leap over cursed crystals and forest slimes.<br>Gather gold. Survive. Beat your best.</p><button id="start">Start quest</button><small>SPACE / CLICK / TAP TO JUMP</small></div></div>
+    </section>
+    <footer><span>✧ Gold grants +50 points</span><span>↑ Space, click or tap to jump</span><span>Every run is a new adventure</span></footer>
+    <p class="hint">Tip: jump a little early — your magic carries you far.</p>
+    <p id="announcement" class="sr-only" aria-live="polite"></p>
+  </main>
+</body>
+</html>
