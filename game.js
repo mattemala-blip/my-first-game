@@ -361,13 +361,16 @@ function drawCharacter(x, y, hero) {
   const motion = Math.sin((0.6 - jumpEffect) / 0.6 * Math.PI);
   circle(x + 18, ground + 3, 18, '#182c3655');
   ctx.save();
-  // Match feet-to-face height; headwear keeps each hero's silhouette distinct.
-  const scale = 1.15;
-  const widthScale = {wizard:1,elf:0.81 * 0.85,warrior:1.05 * 1.05,accountant:1}[hero];
-  const heightScale = hero === 'elf' || hero === 'warrior' ? 1.05 : 1;
-  ctx.translate(x+18,y+54);
-  ctx.scale(scale * widthScale, scale * heightScale);
-  ctx.translate(-x-18,-y-54);
+  // Fit each standing silhouette, including equipment, into the same 60×68 box.
+  const bounds = {
+    wizard: { left: -7, width: 57, height: 68 },
+    elf: { left: -3, width: 61, height: 46 },
+    warrior: { left: -10, width: 60, height: 57 },
+    accountant: { left: 4, width: 50, height: 47 }
+  }[hero];
+  ctx.translate(x - 12, y + 54);
+  ctx.scale(60 / bounds.width, 68 / bounds.height);
+  ctx.translate(-x - bounds.left, -y - 54);
   if (hero === 'elf' && pose) {
     const progress=1-jumpEffect/0.6;ctx.translate(x+22,y+27);
     const turns=[1,-1,2,-2,1];ctx.rotate(progress*Math.PI*2*turns[effectVariant]);
