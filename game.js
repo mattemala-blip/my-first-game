@@ -13,8 +13,10 @@ let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
 let nextDragonTime = Infinity, lastDragonTime = -Infinity, dragonCount = 0;
-function firstDragonDelay() { return 180 + Math.random()*300; }
-function dragonInterval() { return 300 + Math.random()*180; }
+// Temporary creature showcase. Set false to restore the exact normal rarity.
+const wildlifePreview = true;
+function firstDragonDelay() { return wildlifePreview ? 2 : 180 + Math.random()*300; }
+function dragonInterval() { return wildlifePreview ? 26 : 300 + Math.random()*180; }
 function updateDragonSchedule() {
   while (elapsed >= nextDragonTime) {
     lastDragonTime = nextDragonTime;
@@ -361,8 +363,8 @@ function drawLandscape() {
   });
   drawDragons();
   // Widely separated slots with a low chance make bats much rarer than birds.
-  sceneryItems(1800,0.08,(x,i)=>{
-    if(sceneryNoise(i,81)>0.06)return;
+  sceneryItems(wildlifePreview ? 300 : 1800,0.08,(x,i)=>{
+    if(!wildlifePreview && sceneryNoise(i,81)>0.06)return;
     const y=145+sceneryNoise(i,82)*55,flap=Math.sin(elapsed*6+i)*4;
     const color='#4b5268';
     for(let b=0;b<2;b++){
@@ -371,8 +373,8 @@ function drawLandscape() {
       circle(bx,by,3,color);
     }
   });
-  sceneryItems(1800,0.08,(x,i)=>{
-    if(sceneryNoise(i,84)>0.06)return;
+  sceneryItems(wildlifePreview ? 300 : 1800,0.08,(x,i)=>{
+    if(!wildlifePreview && sceneryNoise(i,84)>0.06)return;
     const y=330,color='#222f3a';
     ctx.save();ctx.translate(x,y);ctx.scale(0.65,0.65);
     polygon([[-18,-10],[-12,-21],[12,-24],[25,-33],[33,-30],[42,-24],[32,-18],[21,-17],[17,-4],[-9,-4]],color);
@@ -389,8 +391,8 @@ function drawLandscape() {
     if(sceneryNoise(i,22)<0.72) polygon([[x+23,base-size*2],[x-10,base-15],[x+56,base-15]],rgb(land.trees));
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
   });
-  sceneryItems(1000,0.06,(x,i)=>{
-    if(sceneryNoise(i,83)>0.3)return;
+  sceneryItems(wildlifePreview ? 230 : 1000,0.06,(x,i)=>{
+    if(!wildlifePreview && sceneryNoise(i,83)>0.3)return;
     const y=135+Math.sin(i*3)*32;
     ctx.strokeStyle='#35465a';ctx.lineWidth=2;ctx.beginPath();
     const flap=Math.sin(elapsed*4+i)*5;
