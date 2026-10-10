@@ -194,7 +194,7 @@ function update(dt) {
   particles = particles.filter(p => { p.x += p.vx * dt; p.y += p.vy * dt; if (p.effect === 'accountant') p.vy += 420 * dt; p.life -= dt; return p.life > 0; });
   score = Math.floor(distance / 12) + gold * 50 + bonusScore;
   scoreLabel.textContent = score;
-  const commentInterval = Math.floor(elapsed / 300);
+  const commentInterval = Math.floor(elapsed / 180);
   if (commentInterval > lastCommentInterval) {
     lastCommentInterval = commentInterval;
     speech = chooseComplaint();
