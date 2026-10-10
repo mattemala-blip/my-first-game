@@ -61,7 +61,9 @@
     }
   }
   async function activate() {
-    if (!enabled || document.hidden || (audio && audio.state === 'running')) return;
+    if (!enabled || document.hidden) return;
+    if (audio && audio.state === 'closed') { clearInterval(timer); audio = null; }
+    if (audio && audio.state === 'running') return;
     try {
       if (!audio) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -72,17 +74,19 @@
         master.connect(filter); filter.connect(audio.destination);
         timer = setInterval(schedule, 80);
       }
-      await audio.resume(); nextBeat = audio.currentTime + 0.06; schedule();
+      await audio.resume(); nextBeat = audio.currentTime + 0.06; schedule(); refreshButton();
     } catch {
-      enabled = false; refreshButton(); button.textContent = '♫ Audio unavailable';
+      button.textContent = '♫ Click to resume music';
     }
   }
   button.addEventListener('click', async () => {
+    if (enabled && (!audio || audio.state !== 'running')) { await activate(); return; }
     enabled = !enabled; refreshButton();
     try { localStorage.setItem('rune-music', enabled ? 'on' : 'off'); } catch {}
     if (enabled) await activate(); else if (audio) await audio.suspend();
   });
   document.querySelector('#start').addEventListener('click', activate);
+  document.querySelector('#world').addEventListener('pointerdown', activate);
   document.addEventListener('keydown', event => {
     if (event.code === 'Space' && !event.repeat && !event.target.closest('.characters')) activate();
   });
@@ -90,6 +94,11 @@
     if (document.hidden) { if (audio) audio.suspend(); }
     else if (audio && enabled) activate();
   });
-  window.addEventListener('pagehide', () => { clearInterval(timer); if (audio) audio.close(); });
+  window.addEventListener('pagehide', () => {
+    clearInterval(timer);
+    if (audio && audio.state !== 'closed') audio.close();
+    audio = null; master = null;
+  });
+  window.addEventListener('pageshow', event => { if (event.persisted) activate(); });
   refreshButton();
 })();
