@@ -358,7 +358,9 @@ function drawCharacter(x, y, hero) {
   circle(x + 18, ground + 3, 18, '#182c3655');
   ctx.save();
   const scale = {wizard:0.8,elf:1.15,warrior:0.95,accountant:1.15}[hero];
-  ctx.translate(x+18,y+54);ctx.scale(scale * (hero === 'elf' ? 0.9 : 1),scale);ctx.translate(-x-18,-y-54);
+  ctx.translate(x+18,y+54);
+  ctx.scale(scale * (hero === 'elf' ? 0.9 : hero === 'warrior' ? 1.05 : 1), scale * (hero === 'wizard' || hero === 'warrior' ? 1.1 : 1));
+  ctx.translate(-x-18,-y-54);
   if (hero === 'elf' && pose) {
     const progress=1-jumpEffect/0.6;ctx.translate(x+22,y+27);
     const turns=[1,-1,2,-2,1];ctx.rotate(progress*Math.PI*2*turns[effectVariant]);
