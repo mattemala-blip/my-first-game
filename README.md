@@ -196,3 +196,5 @@ Speed stops increasing at 150,000 points (2,670 pixels/second). Temporary invinc
 Latest scenery refinements: river crossings reserve clear space from buildings, towers, trees, and small props; bridge height aligns with the river. Colored field strips removed and replaced by eight tiny random fantasy props: treasure chest, rune stone, campfire, sword in stone, mushrooms, lantern shrine, banner, and cairn. Props anchor to the foreground bank. Palette stages now last 80 seconds rather than 90, maintaining smooth transitions and a 40-minute cycle. Warrior audio now has a sharper metallic attack and ringing overtones. Temporary invincibility remains ON.
 
 Validated 200 scenery samples, all eight prop designs, river clearance, and retention of invincibility and the speed cap in Chromium.
+
+Background rollback: restored the layout before river-clearance changes, eliminating the moving exclusion zones that made trees pop in/out. Kept eight tiny fantasy decorations instead of field strips, and palette stages now last 75 seconds. Metallic sword sound and temporary invincibility are retained. Validated restored scenery and all eight props in Chromium.

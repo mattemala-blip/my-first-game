@@ -59,7 +59,7 @@ function startGame() {
   elapsed = distance = gold = score = 0;
   scenerySeed = (scenerySeed + 1 + Math.floor(Math.random()*1000000)) % 1000000000;
   sceneryStart = Math.random()*300000;
-  paletteStart = Math.random()*80;
+  paletteStart = Math.random()*75;
   regionOrder = Array.from({length:30},(_,i)=>i);
   for(let i=regionOrder.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
@@ -270,7 +270,7 @@ const regions = Array.from({ length: 30 }, (_, i) => {
     forest: 0.3 + sceneryNoise(i,13)*0.7, peaks: sceneryNoise(i,14), castle: sceneryNoise(i,15) };
 });
 function landscapeAt(seconds) {
-  const progress = (seconds + paletteStart) / 80;
+  const progress = (seconds + paletteStart) / 75;
   const index = Math.floor(progress) % regions.length;
   const fraction = progress % 1;
   const blend = fraction * fraction * (3 - 2 * fraction);
@@ -324,13 +324,12 @@ function drawLandscape() {
     polygon([[x, 306], [x + 28, 306], [x + 140, 335], [x + 75, 362], [x + 230, 388], [x + 110, 388], [x + 10, 364], [x + 75, 338]], '#53868d');
     for (let k=0;k<4;k++) rect(x + 35 + k * 16, 336 + k * 11, 27, 2, '#8caea7');
     // Wooden bridge.
-    rect(x + 28, 337, 103, 8, '#af8058'); rect(x + 28, 330, 103, 3, '#dfb480');
-    for(let k=0;k<5;k++) rect(x + 30 + k*24, 330, 3, 17, '#805e48');
+    rect(x + 28, 353, 103, 8, '#af8058'); rect(x + 28, 346, 103, 3, '#dfb480');
+    for(let k=0;k<5;k++) rect(x + 30 + k*24, 346, 3, 17, '#805e48');
   });
   sceneryItems(1100, 0.12, (x, i) => {
-    if (nearRiver(x,160)) return;
     const type = Math.floor(sceneryNoise(i,21) * 7);
-    const y = 329;
+    const y = 335 + Math.sin(i * 2.4) * 10;
     ctx.save();ctx.translate(x,y);ctx.scale(0.75,0.75);ctx.translate(-x,-y);
     if (type === 0 || type === 4) {
       if(type===0) drawCastle(x,y,Math.floor(sceneryNoise(i,70)*20),land);
@@ -347,7 +346,7 @@ function drawLandscape() {
     ctx.restore();
   });
   sceneryItems(900,0.1,(x,i)=>{
-    if(!nearRiver(x,80) && sceneryNoise(i,72)<0.025) drawWizardTower(x,326,Math.floor(sceneryNoise(i,73)*3));
+    if(sceneryNoise(i,72)<0.025) drawWizardTower(x,326,Math.floor(sceneryNoise(i,73)*3));
   });
   sceneryItems(1000,0.06,(x,i)=>{
     if(sceneryNoise(i,87)<0.01)drawDragon(x,105+sceneryNoise(i,88)*40,elapsed+i,true);
@@ -376,7 +375,6 @@ function drawLandscape() {
   for(let x=0;x<=980;x+=20)bank.push([x,forestFloorAt(x)]);
   bank.push([980,ground]);polygon(bank,rgb(land.trees.map(v=>v+5)));
   sceneryItems(85, 0.22, (x, i) => {
-    if (nearRiver(x+23,45)) return;
     const variation = (Math.sin(i * 4.7)+1)/2;
     const size = 42 + land.forest*45 + variation*24;
     const base = forestFloorAt(x+23)+5;
@@ -386,7 +384,7 @@ function drawLandscape() {
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
   });
   sceneryItems(650,0.22,(x,i)=>{
-    if(sceneryNoise(i,92)<0.65 && !nearRiver(x,30))drawTinyProp(x,forestFloorAt(x)+3,Math.floor(sceneryNoise(i,93)*8));
+    if(sceneryNoise(i,92)<0.65)drawTinyProp(x,forestFloorAt(x)+3,Math.floor(sceneryNoise(i,93)*8));
   });
   sceneryItems(1000,0.08,(x,i)=>{
     if(sceneryNoise(i,89)<0.02)drawWolf(x,forestFloorAt(x)+3,true);
@@ -622,11 +620,6 @@ function drawWolf(x,y,white=false) {
     circle(34,-28,1,white?'#ed4455':'#77878b');ctx.restore();
 }
 
-function nearRiver(x,padding) {
- const offset=(distance+sceneryStart)*0.09;
- const river=Math.round((x+offset-90)/2800)*2800-offset;
- return x>river-padding && x<river+230+padding;
-}
 function drawTinyProp(x,y,type) {
  ctx.save();ctx.translate(x,y);
  // Small, muted decorations; they are never gameplay obstacles.
