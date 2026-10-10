@@ -141,11 +141,11 @@ function spawnPattern(speed) {
 function update(dt) {
   elapsed += dt;
   if (elapsed >= nextBlueTime) {
-    coins.push({ x: 930, y: ground - 120, width: 22, height: 22, blue: true });
+    spawnTreasureChallenge('blue');
     nextBlueTime = elapsed + blueInterval();
   }
   if (!purpleSpawned && elapsed >= purpleTime) {
-    coins.push({ x: 930, y: ground - 120, width: 22, height: 22, purple: true });
+    spawnTreasureChallenge('purple');
     purpleSpawned = true;
   }
   jumpEffect = Math.max(0, jumpEffect - dt);
@@ -155,6 +155,9 @@ function update(dt) {
   player.velocity += 1700 * dt;
   player.y = Math.min(ground - player.height, player.y + player.velocity * dt);
   if (player.y === ground - player.height) { player.velocity = 0; jumps = 0; }
+  // Leave a clear approach before a scheduled treasure challenge.
+  const untilTreasure = Math.min(nextBlueTime - elapsed, purpleSpawned ? Infinity : purpleTime - elapsed);
+  if (untilTreasure > 0 && untilTreasure < 3) nextSpawn = Math.max(nextSpawn, 3);
   nextSpawn -= dt;
   if (nextSpawn <= 0) {
     spawnPattern(speed);
@@ -205,7 +208,7 @@ function draw() {
     circle(coin.x+11,coin.y+11,12,coin.purple?'#d9a3ff':coin.blue?'#78ddff':'#ffcf65');
     circle(coin.x+11,coin.y+11,8,coin.purple?'#8a45bb':coin.blue?'#297ac5':'#c98732');
     if(coin.purple){ctx.font='bold 8px system-ui';ctx.fillStyle='#fff0ff';ctx.fillText('★',coin.x+7,coin.y+14);}
-    else if(coin.blue){ctx.font='bold 9px system-ui';ctx.fillStyle='#e6fbff';ctx.fillText('20',coin.x+5,coin.y+14);}
+    else if(coin.blue) rect(coin.x+9,coin.y+5,4,12,'#d8f6ff');
     else rect(coin.x+9,coin.y+5,4,12,'#ffe4a0');
   }
   for (const o of obstacles) drawObstacle(o);
@@ -365,9 +368,9 @@ function drawCharacter(x, y, hero) {
     if(effectVariant===4)ctx.scale(Math.max(0.2,Math.abs(Math.cos(progress*Math.PI*2))),1);
     ctx.translate(-x-22,-y-27);
   }
-  if (hero === 'warrior' && pose && effectVariant >= 4) {
-    const progress=1-jumpEffect/0.6,flip=effectVariant-4;
-    ctx.translate(x+22,y+27);ctx.rotate(progress*Math.PI*2*(flip%2?-1:1)*(1+Math.floor(flip/2)));ctx.translate(-x-22,-y-27);
+  if (hero === 'warrior' && pose && effectVariant === 7) {
+    const progress=1-jumpEffect/0.6;
+    ctx.translate(x+22,y+27);ctx.rotate(progress*Math.PI*2);ctx.translate(-x-22,-y-27);
   }
   const outfits = { wizard: '#8459ce', elf: '#52966a', warrior: '#a7b9d0', accountant: '#50607d' };
   rect(x + 4, y + 28, 28, 22, outfits[hero]);
@@ -386,7 +389,7 @@ function drawCharacter(x, y, hero) {
     rect(x + 29, y + 28, 29, 2, '#f7e6bd');
   } else if (hero === 'warrior') {
     rect(x + 5, y + 6, 31, 12, '#cedae8'); rect(x + 8, y + 17, 6, 12, '#8798b2'); rect(x + 20, y - 3, 7, 10, '#e5809d');
-    // Four directional slashes and four slash/flip combinations.
+    // Seven directional sword hacks and one forward flip.
     const move = warriorMove(effectVariant, jumpEffect);
     const armAngle = pose ? move.sword : 0;
     const grip = warriorGrip(x, y, armAngle);
@@ -461,11 +464,36 @@ function drawGrass() {
 
 function warriorMove(variant, remaining) {
   const progress = 1 - remaining / 0.6;
-  const direction = [0.7, -0.8, 2.0, -2.1][variant % 4];
+  const direction = [0.5, -0.65, 1.2, -1.3, 1.9, -2.0, 2.6, 0][variant];
   const swing = Math.sin(progress * Math.PI);
-  return { sword: direction * swing, shield: (variant % 4 - 1.5) * swing * 0.4 };
+  return { sword: direction * swing, shield: (variant % 7 - 3) * swing * 0.4 };
 }
 function warriorGrip(x, y, angle) {
   // The arm always has the same length; only its angle changes.
   return { x: x + 30 + 11 * Math.cos(angle) - 8 * Math.sin(angle), y: y + 32 + 11 * Math.sin(angle) + 8 * Math.cos(angle) };
+}
+
+// Offsets are measured in travel seconds, so challenges scale with running speed.
+const treasureChallenges = {
+  blue: [
+    { height: 205, offsets: [-0.24] },
+    { height: 220, offsets: [-0.32, 0.23] },
+    { height: 190, offsets: [-0.18, -0.08] },
+    { height: 235, offsets: [-0.36] }
+  ],
+  purple: [
+    { height: 267, offsets: [-0.30, 0.20] },
+    { height: 275, offsets: [-0.38, -0.24, 0.24] },
+    { height: 263, offsets: [-0.23, 0.13, 0.25] },
+    { height: 278, offsets: [-0.34, 0.27] }
+  ]
+};
+function spawnTreasureChallenge(type) {
+  const options=treasureChallenges[type];
+  const challenge=Math.floor(Math.random()*options.length);
+  const layout=options[challenge], speed=speedForScore(score), coinX=Math.max(930,player.x+speed*1.8);
+  coins.push({x:coinX,y:ground-layout.height,width:22,height:22,[type]:true,challenge});
+  const kinds=['spikes','thorn','gargoyle','crystal'];
+  for(const offset of layout.offsets) obstacles.push({x:coinX+offset*speed,y:ground-48,width:30,height:48,kind:kinds[Math.floor(Math.random()*kinds.length)],treasure:true});
+  nextSpawn=Math.max(nextSpawn,2.2);
 }

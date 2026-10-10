@@ -97,7 +97,7 @@ Validated all obstacle drawing paths, milestone messages and threshold stability
 
 ## Random effects and rare treasure
 
-Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 8 moves (4 directional slashes and 4 slash/flip combinations), Elf has 5 flip styles, and World Banker has 150 paper-throw combinations (25 document sets × 6 throw styles, with varied counts, sizes, and directions). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
+Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 8 moves (7 sword hacks and 1 forward flip), Elf has 5 flip styles, and World Banker has 150 paper-throw combinations (25 document sets × 6 throw styles, with varied counts, sizes, and directions). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
 
 Milestone dialogue randomly picks from 24 complaints and avoids immediately repeating the previous line, including across restarts. Grass blades replace the colorful ground dots. The title credit reads “A game by Matteo Malacarne.”
 
@@ -112,3 +112,11 @@ Latest refinement: each sheet in a paper throw has a distinct heading, chosen fr
 One purple coin appears per run at a randomly scheduled time from 5 to 20 minutes of active gameplay. It awards 50,000 bonus points, separate from gold. Missing it does not cause another to spawn. Restarting schedules a new one. Blue coins continue on their independent 2–5 minute schedule. The footer uses matching gold, blue, and purple coin drawings with their point values. Warrior now randomly selects from eight fixed-arm slash/flip moves.
 
 Validated purple timing boundaries, one spawn over a simulated 25-minute run, the exact 50,000-point reward, restart reset, all eight Warrior drawing paths, coin legend, and mobile layout/jumping in Chromium.
+
+## Treasure challenges
+
+Warrior now has exactly seven directional sword hacks and one forward flip. Wizard retains 50 random variations; World Banker retains 150. Blue coins have a plain center stripe, without “20,” including in the legend.
+
+Each blue or purple spawn randomly chooses one of four obstacle layouts. Blue coins demand a timed double jump above or just after obstacles; purple coins sit higher among tighter obstacle groups. Layout offsets scale with speed and leave reaction time, while normal obstacle spawning pauses around their approach. Blue recurrence and once-per-run purple scheduling remain in place.
+
+Browser validation found successful timed double jumps for all 24 combinations of coin type, layout, and three representative speeds (0/30,000/70,000 points), and rendered all 208 Wizard/Warrior/World Banker variants without browser errors.
