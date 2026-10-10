@@ -12,6 +12,7 @@ let state = 'ready';
 let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
+let dragonTimes = [];
 let lastCommentInterval = 0, speech = '', speechTime = 0;
 const complaints = [
   'This is going too fast!', 'Could we slow down a little?', 'My boots have no brakes!',
@@ -61,6 +62,7 @@ function startGame() {
   player.velocity = 0;
   jumps = 0;
   jumpEffect = 0;
+  dragonTimes = [180 + Math.random()*180, 660 + Math.random()*240, 1260 + Math.random()*300];
   lastCommentInterval = 0; speech = ''; speechTime = 0;
   character = document.querySelector('input[name=hero]:checked').value;
   scoreLabel.textContent = goldLabel.textContent = '0';
@@ -177,9 +179,9 @@ function update(dt) {
   }
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
-    if (coin.high) {
+    {
       if (coin.baseY === undefined) { coin.baseY = coin.y; coin.bobPhase = coin.x / 90; }
-      coin.y = coin.baseY + Math.sin(elapsed * 6 + coin.bobPhase) * 4;
+      coin.y = coin.baseY + Math.sin(elapsed * 6 + coin.bobPhase) * 2.5;
     }
     if (overlaps(player, coin)) {
       if (coin.purple) bonusScore += 50000;
@@ -194,7 +196,7 @@ function update(dt) {
   particles = particles.filter(p => { p.x += p.vx * dt; p.y += p.vy * dt; if (p.effect === 'accountant') p.vy += 420 * dt; p.life -= dt; return p.life > 0; });
   score = Math.floor(distance / 12) + gold * 50 + bonusScore;
   scoreLabel.textContent = score;
-  const commentInterval = Math.floor(elapsed / 180);
+  const commentInterval = complaintCountAt(elapsed);
   if (commentInterval > lastCommentInterval) {
     lastCommentInterval = commentInterval;
     speech = chooseComplaint();
@@ -319,14 +321,8 @@ function drawLandscape() {
     const y = 335 + Math.sin(i * 2.4) * 10;
     ctx.save();ctx.translate(x,y);ctx.scale(0.75,0.75);ctx.translate(-x,-y);
     if (type === 0 || type === 4) {
-      // Castles and country manors alternate along the road.
-      const castle = type === 0;
-      rect(x, y - 64, 115, 64, castle ? rgb(land.mountain.map(v=>v+22)) : '#747d8d');
-      if (castle) {
-        for(let t=0;t<2;t++) { const tx=x-12+t*110; rect(tx,y-95,30,95,rgb(land.mountain.map(v=>v+12))); for(let k=0;k<3;k++)rect(tx+k*12,y-104,7,12,rgb(land.mountain.map(v=>v+12))); rect(tx+12,y-81,7,15,'#b2ae99'); }
-      } else polygon([[x-10,y-64],[x+55,y-102],[x+125,y-64]], '#865e79');
-      for(let k=0;k<4;k++)rect(x+12+k*26,y-49,9,14,'#b2ae99');
-      rect(x+48,y-27,20,27,'#635776');
+      if(type===0) drawCastle(x,y,Math.floor(sceneryNoise(i,70)*20),land);
+      else {rect(x,y-60,90,60,'#747d8d');polygon([[x-8,y-60],[x+45,y-88],[x+98,y-60]],'#675c75');rect(x+37,y-25,16,25,'#44495f');}
     } else if (type === 2 || type === 5) {
       // Villages, cottages, orchards and fences.
       for(let h=0;h<2;h++) { const hx=x+h*60; rect(hx,y-32,48,32,'#747d8d'); polygon([[hx-6,y-32],[hx+24,y-58],[hx+54,y-32]],h?'#966f91':'#b27468'); rect(hx+7,y-23,10,10,'#6f8d99');rect(hx+29,y-21,10,21,'#765948'); }
@@ -340,6 +336,10 @@ function drawLandscape() {
     }
     ctx.restore();
   });
+  sceneryItems(900,0.1,(x,i)=>{
+    if(sceneryNoise(i,72)<0.025) drawWizardTower(x,326,Math.floor(sceneryNoise(i,73)*3));
+  });
+  drawDragons();
   sceneryItems(85, 0.22, (x, i) => {
     const variation = (Math.sin(i * 4.7)+1)/2;
     const size = 42 + land.forest*45 + variation*24;
@@ -349,10 +349,7 @@ function drawLandscape() {
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
   });
   sceneryItems(1250,0.18,(x,i)=>{
-    const sheep=sceneryNoise(i,23)<0.5, y=372;
-    if(sheep){circle(x+12,y-10,12,'#f4eddd');circle(x+26,y-10,6,'#655b61');}
-    else {rect(x,y-19,27,14,'#c89a72');rect(x+23,y-28,8,20,'#c89a72');polygon([[x+24,y-27],[x+20,y-36],[x+27,y-32]],'#8b6955');}
-    rect(x+4,y-5,3,8,'#655b61');rect(x+20,y-5,3,8,'#655b61');
+    drawAnimal(x,372,Math.floor(sceneryNoise(i,71)*animals.length));
   });
   sceneryItems(600,0.06,(x,i)=>{
     const y=135+Math.sin(i*3)*32;
@@ -523,4 +520,72 @@ function spawnTreasureChallenge(type) {
   const kinds=['spikes','thorn','gargoyle','crystal'];
   for(const offset of layout.offsets) obstacles.push({...makeObstacle(coinX+offset*speed,kinds[Math.floor(Math.random()*kinds.length)]),treasure:true});
   nextSpawn=Math.max(nextSpawn,2.2);
+}
+
+function complaintCountAt(seconds) {
+  return seconds < 180 ? 0 : seconds < 360 ? 1 : 2 + Math.floor((seconds-360)/120);
+}
+// Twenty distinct species, with silhouettes suited to a mythical forest.
+const animals = [
+ ['Wolf','canine','#7c8795'],['Dire wolf','canine','#586575'],['Fox','canine','#a67862'],['Arctic fox','canine','#bbc5ca'],
+ ['Stag','deer','#a08a74'],['Doe','deer','#b49a80'],['Elk','deer','#8b7967'],['Reindeer','deer','#9e9989'],
+ ['Unicorn','horse','#c5c9d3'],['Forest pony','horse','#817581'],['Wild horse','horse','#9b8475'],
+ ['Bear','bear','#77706b'],['Boar','bear','#686e72'],['Badger','bear','#96999b'],
+ ['Hare','rabbit','#a49b94'],['Moon rabbit','rabbit','#b7c1cc'],['Lynx','cat','#a3967e'],['Panther','cat','#485363'],
+ ['Griffin','winged','#a6a28f'],['Hippogriff','winged','#8e99a7']
+];
+function drawAnimal(x,y,index) {
+ const [name,shape,color]=animals[index];
+ ctx.save();ctx.translate(x,y);ctx.scale(0.85,0.85);
+ const bulk=shape==='bear'?1.25:1;
+ ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(12,-14,16*bulk,8*bulk,0,0,Math.PI*2);ctx.fill();
+ const neck=shape==='deer'||shape==='horse';
+ rect(24,-(neck?33:23),7,neck?24:14,color);circle(30,neck?-33:-22,6,color);
+ for(const leg of [1,10,20,27])rect(leg,-9,3,10,color);
+ circle(33,neck?-34:-23,1,'#293242');
+ if(shape==='canine'||shape==='cat'){polygon([[25,-25],[24,-34],[30,-28]],color);polygon([[4,-16],[-13,-26],[-5,-15],[0,-10]],color);}
+ if(shape==='deer'&&name!=='Doe'){ctx.strokeStyle=color;ctx.lineWidth=2;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(28,-36);ctx.lineTo(28+side*9,-49);ctx.lineTo(28+side*14,-46);ctx.moveTo(28+side*6,-45);ctx.lineTo(28+side*6,-52);ctx.stroke();}}
+ if(shape==='horse'){polygon([[24,-34],[18,-36],[20,-16],[24,-12]],'#545a69');if(name==='Unicorn')polygon([[32,-38],[37,-53],[35,-37]],'#d9d0b3');}
+ if(shape==='bear'){circle(27,-28,3,color);if(name==='Boar')polygon([[33,-20],[40,-24],[38,-17]],'#c9c4ac');if(name==='Badger')rect(29,-27,3,11,'#d0d0bd');}
+ if(shape==='rabbit'){rect(24,-42,4,18,color);rect(31,-39,4,15,color);circle(-2,-13,5,color);}
+ if(shape==='winged'){polygon([[9,-16],[-2,-44],[12,-35],[21,-46],[25,-17]],color);polygon([[34,-23],[43,-19],[34,-17]],'#b9ac8b');}
+ if(name==='Lynx')for(let k=0;k<4;k++)circle(k*7,-16,1.5,'#635c59');
+ ctx.restore();
+}
+function drawCastle(x,y,variant,land) {
+ const family=Math.floor(variant/5),detail=variant%5;
+ const stone=rgb(land.mountain.map(v=>v+18+family*3)),roof=['#635775','#586776','#6c5966','#526b70'][family];
+ const width=85+detail*7;
+ rect(x,y-48-detail*3,width,48+detail*3,stone);
+ const count=2+family;
+ for(let t=0;t<count;t++){
+  const tx=x-7+t*(width-8)/(count-1),height=65+detail*5+(t%2)*9;
+  rect(tx,y-height,18, height,stone);
+  if(family===1||family===3)polygon([[tx-4,y-height],[tx+9,y-height-17-detail*2],[tx+22,y-height]],roof);
+  else for(let k=0;k<3;k++)rect(tx+k*7,y-height-6,4,8,stone);
+  rect(tx+6,y-height+12,5,10,'#a5a597');
+ }
+ for(let k=0;k<3+detail;k++)rect(x+10+k*15,y-35,5,7,'#a5a597');
+ rect(x+width/2-8,y-23,16,23,'#41465c');
+ if(family===2){rect(x-18,y-7,width+35,7,stone);rect(x-10,y-18,5,18,stone);}
+ if(detail%2===0){rect(x+width/2,y-80,2,15,stone);polygon([[x+width/2+2,y-80],[x+width/2+15,y-75],[x+width/2+2,y-70]],roof);}
+}
+function drawWizardTower(x,y,type) {
+ ctx.save();ctx.translate(x,y);ctx.scale(0.7,0.7);
+ const stone=['#657084','#72687e','#596e78'][type];
+ polygon([[0,0],[7,-85-type*8],[29,-85-type*8],[36,0]],stone);
+ polygon([[-3,-82-type*8],[18,-119-type*9],[40,-82-type*8]],'#51475f');
+ for(let i=0;i<3;i++)rect(15,-25-i*23,6,9,'#a8aeaa');
+ if(type===1) {rect(-9,-50,55,5,stone);rect(-7,-63,3,14,stone);rect(42,-63,3,14,stone);}
+ if(type===2) {circle(18,-122,5,'#9baab1');rect(-7,-18,50,6,stone);}
+ ctx.restore();
+}
+function drawDragons() {
+ for(let i=0;i<dragonTimes.length;i++){
+  const age=elapsed-dragonTimes[i];if(age<0||age>24)continue;
+  const x=1010-age*46,y=95+i*18+Math.sin(age*0.35)*7;
+  const flap=Math.sin(age*2)*13,color='#46556b';
+  polygon([[x-22,y],[x+17,y-3],[x+27,y-9],[x+33,y-4],[x+22,y+4],[x-18,y+6],[x-38,y+2]],color);
+  polygon([[x-5,y],[x-26,y-24-flap],[x+2,y-13],[x+22,y-24-flap],[x+12,y+2]],color);
+ }
 }

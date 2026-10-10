@@ -160,3 +160,11 @@ The reproducible composer is `scripts/render_soundtrack.py` (Python with NumPy);
 All ten obstacle types now randomly use small (75%), medium (100%), or large (125%) size, with collision boxes scaled alongside the artwork. Normal obstacle groups mix random types/sizes and spacing. Gold coins randomly appear at low, middle, and sky heights with varied counts and horizontal gaps; sky coins keep bobbing. Treasure challenges also use random obstacle sizes.
 
 Validated all three sizes, ten types, three coin-height bands, randomized placements, ground alignment, rendering, and collectibility of all treasure challenge layouts at three representative speeds in Chromium.
+
+## Fantasy wildlife and timed complaints
+
+Random complaints appear at 3, 6, 8, 10, 12 minutes and every two minutes thereafter, measured in active gameplay time. All coins now bob gently by ±2.5 pixels, including blue and purple treasure.
+
+The forest has 20 creature designs: wolf, dire wolf, fox, arctic fox, stag, doe, elk, reindeer, unicorn, forest pony, wild horse, bear, boar, badger, hare, moon rabbit, lynx, panther, griffin, and hippogriff. Castles randomly vary across 20 combinations of architecture and details. Three muted wizard tower designs have a 2.5% chance per widely spaced scenery slot. Each run schedules exactly three distant dragon passes in separate windows (3–6, 11–15, and 21–26 minutes); shorter runs may see fewer. Scenery remains decorative.
+
+Validated complaint thresholds, bobbing for all coin categories, all creature/castle/tower drawing paths, dragon schedule reset, and collectibility of treasure challenges at three speeds in Chromium.
