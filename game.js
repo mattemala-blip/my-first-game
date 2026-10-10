@@ -369,7 +369,7 @@ function drawCharacter(x, y, hero) {
     accountant: { left: 4, width: 50, height: 47 }
   }[hero];
   ctx.translate(x - 12, y + 54);
-  ctx.scale(60 / bounds.width, 68 / bounds.height);
+  ctx.scale((60 / bounds.width) * (hero === 'warrior' ? 1.05 : 1), (68 / bounds.height) * (hero === 'wizard' || hero === 'warrior' ? 1.05 : 1));
   ctx.translate(-x - bounds.left, -y - 54);
   if (hero === 'elf' && pose) {
     const progress=1-jumpEffect/0.6;ctx.translate(x+22,y+27);
@@ -397,7 +397,12 @@ function drawCharacter(x, y, hero) {
     ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + 34, y + 10); ctx.lineTo(x + 34, y + 48); ctx.stroke();
     rect(x + 29, y + 28, 29, 2, '#f7e6bd');
   } else if (hero === 'warrior') {
-    rect(x + 5, y + 6, 31, 12, '#cedae8'); rect(x + 8, y + 17, 6, 12, '#8798b2'); rect(x + 20, y - 3, 7, 10, '#e5809d');
+    // Steel Viking helmet with two curved ivory horns.
+    rect(x + 5, y + 6, 31, 12, '#cedae8');
+    rect(x + 8, y + 17, 6, 12, '#8798b2');
+    polygon([[x+7,y+11],[x-1,y+7],[x-4,y-3],[x+2,y+1],[x+5,y+6],[x+12,y+7]],'#eee0bd');
+    polygon([[x+30,y+11],[x+38,y+7],[x+41,y-3],[x+35,y+1],[x+32,y+6],[x+25,y+7]],'#eee0bd');
+    rect(x+19,y+6,4,12,'#8798b2');
     // Seven directional sword hacks and one forward flip.
     const move = warriorMove(effectVariant, jumpEffect);
     const armAngle = pose ? move.sword : 0;
