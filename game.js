@@ -348,12 +348,12 @@ function drawLandscape() {
   sceneryItems(900,0.1,(x,i)=>{
     if(sceneryNoise(i,72)<0.025) drawWizardTower(x,326,Math.floor(sceneryNoise(i,73)*3));
   });
-  sceneryItems(3000,0.06,(x,i)=>{
+  sceneryItems(1000,0.06,(x,i)=>{
     if(sceneryNoise(i,85)<0.05)drawDragon(x,95+sceneryNoise(i,86)*50,elapsed+i);
   });
   // Widely separated slots with a low chance make bats much rarer than birds.
-  sceneryItems(1500,0.08,(x,i)=>{
-    if(sceneryNoise(i,81)>0.15)return;
+  sceneryItems(1000,0.08,(x,i)=>{
+    if(sceneryNoise(i,81)>0.3)return;
     const y=145+sceneryNoise(i,82)*55,flap=Math.sin(elapsed*6+i)*4;
     const color='#4b5268';
     for(let b=0;b<2;b++){
@@ -363,8 +363,8 @@ function drawLandscape() {
       circle(bx,by,3,color);ctx.restore();
     }
   });
-  sceneryItems(1500,0.08,(x,i)=>{
-    if(sceneryNoise(i,84)>0.15)return;
+  sceneryItems(1000,0.08,(x,i)=>{
+    if(sceneryNoise(i,84)>0.3)return;
     const y=330,color='#222f3a';
     ctx.save();ctx.translate(x,y);ctx.scale(0.4875,0.4875);
     polygon([[-18,-10],[-12,-21],[12,-24],[25,-33],[33,-30],[42,-24],[32,-18],[21,-17],[17,-4],[-9,-4]],color);
@@ -382,7 +382,7 @@ function drawLandscape() {
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
   });
   sceneryItems(1000,0.06,(x,i)=>{
-    if(sceneryNoise(i,83)>0.3)return;
+    if(sceneryNoise(i,83)>0.6)return;
     const y=135+Math.sin(i*3)*32;
     ctx.strokeStyle='#35465a';ctx.lineWidth=2;ctx.beginPath();
     const flap=Math.sin(elapsed*4+i)*5;
