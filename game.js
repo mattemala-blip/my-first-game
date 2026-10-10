@@ -9,6 +9,8 @@ const startButton = document.querySelector('#start');
 const ground = 388;
 const player = { x: 155, y: ground - 54, width: 34, height: 54, velocity: 0 };
 let state = 'ready';
+// Temporary testing switch: set false to restore obstacle collisions.
+const invincible = true;
 let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
@@ -128,7 +130,7 @@ function overlaps(a, b) {
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 // Speed steps depend on this run's score, including collected gold.
-function speedForScore(points) { return 270 + Math.floor(points / 500) * 8; }
+function speedForScore(points) { return 270 + Math.floor(Math.min(points,150000) / 500) * 8; }
 const obstacleKinds = ['slime','crystal','spikes','mushroom','skull','stump','chest','gargoyle','cauldron','thorn'];
 const obstacleSizes = [0.75, 1, 1.25];
 function makeObstacle(x, kind = obstacleKinds[Math.floor(Math.random()*obstacleKinds.length)]) {
@@ -184,7 +186,7 @@ function update(dt) {
   for (const obstacle of obstacles) {
     obstacle.x -= speed * dt;
     // A slightly forgiving hitbox makes close jumps feel fair.
-    if (overlaps({ x: player.x + 7, y: player.y + 8, width: 20, height: 44 }, obstacle)) { endGame(); return; }
+    if (!invincible && overlaps({ x: player.x + 7, y: player.y + 8, width: 20, height: 44 }, obstacle)) { endGame(); return; }
   }
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
@@ -349,6 +351,9 @@ function drawLandscape() {
     if(sceneryNoise(i,72)<0.025) drawWizardTower(x,326,Math.floor(sceneryNoise(i,73)*3));
   });
   sceneryItems(1000,0.06,(x,i)=>{
+    if(sceneryNoise(i,87)<0.01)drawDragon(x,105+sceneryNoise(i,88)*40,elapsed+i,true);
+  });
+  sceneryItems(1000,0.06,(x,i)=>{
     if(sceneryNoise(i,85)<0.05)drawDragon(x,95+sceneryNoise(i,86)*50,elapsed+i);
   });
   // Widely separated slots with a low chance make bats much rarer than birds.
@@ -365,21 +370,23 @@ function drawLandscape() {
   });
   sceneryItems(1000,0.08,(x,i)=>{
     if(sceneryNoise(i,84)>0.3)return;
-    const y=330,color='#222f3a';
-    ctx.save();ctx.translate(x,y);ctx.scale(0.4875,0.4875);
-    polygon([[-18,-10],[-12,-21],[12,-24],[25,-33],[33,-30],[42,-24],[32,-18],[21,-17],[17,-4],[-9,-4]],color);
-    polygon([[27,-31],[25,-42],[34,-32]],color);
-    polygon([[-13,-17],[-34,-30],[-27,-14],[-15,-7]],color);
-    for(const leg of [-10,3,16,25])rect(leg,-9,3,15,color);
-    circle(34,-28,1,'#77878b');ctx.restore();
+    drawWolf(x,330);
   });
+  // A solid foreground bank grounds the trees and hides distant scenery bases.
+  const bank = [[0,ground],[0,forestFloorAt(0)]];
+  for(let x=0;x<=980;x+=20)bank.push([x,forestFloorAt(x)]);
+  bank.push([980,ground]);polygon(bank,rgb(land.trees.map(v=>v+5)));
   sceneryItems(85, 0.22, (x, i) => {
     const variation = (Math.sin(i * 4.7)+1)/2;
     const size = 42 + land.forest*45 + variation*24;
-    const base = 359 + Math.sin(i)*12;
+    const base = forestFloorAt(x+23)+5;
+    polygon([[x+15,base+2],[x+19,base-12],[x+27,base-12],[x+32,base+2]],'#725544');
     rect(x+19,base-size,8,size,'#86644b');
     if(sceneryNoise(i,22)<0.72) polygon([[x+23,base-size*2],[x-10,base-15],[x+56,base-15]],rgb(land.trees));
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
+  });
+  sceneryItems(1000,0.08,(x,i)=>{
+    if(sceneryNoise(i,89)<0.02)drawWolf(x,forestFloorAt(x)+3,true);
   });
   sceneryItems(1000,0.06,(x,i)=>{
     if(sceneryNoise(i,83)>0.6)return;
@@ -585,18 +592,29 @@ function drawWizardTower(x,y,type) {
  if(type===2) {circle(18,-122,5,'#9baab1');rect(-7,-18,50,6,stone);}
  ctx.restore();
 }
-function drawDragon(x,y,age) {
-  const flap=Math.sin(age*2)*13,color='#46556b';
+function drawDragon(x,y,age,white=false) {
+  const flap=Math.sin(age*2)*13,color=white?'#d8e2ed':'#46556b';
   // Short, flickering fire-breath bursts; scenery only, never a hazard.
   const breath = age % 6;
   if (breath > 0.6 && breath < 2.9) {
     const strength = Math.sin((breath-0.6)/2.3*Math.PI);
     const reach = 18 + strength*30 + Math.sin(age*24)*3;
     const mouthX=x+31,mouthY=y-3;
-    polygon([[mouthX,mouthY-2],[mouthX+reach*0.55,mouthY-8*strength],[mouthX+reach,mouthY-3],[mouthX+reach*0.8,mouthY+3],[mouthX+reach,mouthY+7],[mouthX+reach*0.4,mouthY+6*strength],[mouthX,mouthY+2]],'#ce7950');
-    polygon([[mouthX,mouthY-1],[mouthX+reach*0.7,mouthY-2],[mouthX+reach*0.5,mouthY+3],[mouthX,mouthY+1]],'#f2c579');
+    polygon([[mouthX,mouthY-2],[mouthX+reach*0.55,mouthY-8*strength],[mouthX+reach,mouthY-3],[mouthX+reach*0.8,mouthY+3],[mouthX+reach,mouthY+7],[mouthX+reach*0.4,mouthY+6*strength],[mouthX,mouthY+2]],white?'#589cdd':'#ce7950');
+    polygon([[mouthX,mouthY-1],[mouthX+reach*0.7,mouthY-2],[mouthX+reach*0.5,mouthY+3],[mouthX,mouthY+1]],white?'#a2efff':'#f2c579');
   }
 
   polygon([[x-22,y],[x+17,y-3],[x+27,y-9],[x+33,y-4],[x+22,y+4],[x-18,y+6],[x-38,y+2]],color);
   polygon([[x-5,y],[x-26,y-24-flap],[x+2,y-13],[x+22,y-24-flap],[x+12,y+2]],color);
+}
+
+function forestFloorAt(x) { return 350 + Math.sin((x+(distance+sceneryStart)*0.22)/180)*7; }
+function drawWolf(x,y,white=false) {
+    const color=white?'#d3dde2':'#222f3a';
+    ctx.save();ctx.translate(x,y);ctx.scale(0.4875,0.4875);
+    polygon([[-18,-10],[-12,-21],[12,-24],[25,-33],[33,-30],[42,-24],[32,-18],[21,-17],[17,-4],[-9,-4]],color);
+    polygon([[27,-31],[25,-42],[34,-32]],color);
+    polygon([[-13,-17],[-34,-30],[-27,-14],[-15,-7]],color);
+    for(const leg of [-10,3,16,25])rect(leg,-9,3,15,color);
+    circle(34,-28,1,white?'#ed4455':'#77878b');ctx.restore();
 }

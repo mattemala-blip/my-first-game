@@ -3,7 +3,7 @@
   const pools = {};
   for (const hero of ['wizard','elf','warrior','accountant']) {
     pools[hero] = Array.from({length:2}, () => {
-      const sound = new Audio(`assets/sounds/${hero}.wav`);
+      const sound = new Audio(`assets/sounds/${hero}.wav?v=2`);
       sound.volume = 0.35;
       sound.preload = 'auto';
       return sound;

@@ -186,3 +186,9 @@ Validated exact dragon timing bounds, no early first pass, twelve repeated passe
 Latest scenery settings: bats and wolves each have a 15% chance per 1,500-background-pixel slot. Dragons now use scenery placement instead of a timer: 5% per 3,000-pixel slot, retaining animated fire breath. Birds retain 30% per 1,000-pixel slot. Random scenery seeds vary placement each run.
 
 Double jumps have quiet original sound effects in `assets/sounds`, played by `sounds.js`: sword swoosh for Warrior hacks, sparkle chimes for Wizard, spin whoosh for Elf, and paper rustle for World Banker. The Warrior flip has no sword sound. Wizard staff tilts slightly during the effect. Chromium verified all four sound triggers and scenery/animation drawing without browser errors.
+
+## White creatures and temporary testing mode
+
+Foreground trees are rooted in a solid terrain bank instead of appearing above unrelated distant scenery. White dragons with blue fire have a 1% chance per 1,000-pixel sky slot; white wolves with red eyes have a 2% chance per 1,000-pixel scenery slot. These use independent slots from the regular variants. Warrior sound is a quiet metallic sword “schiing.”
+
+Speed stops increasing at 150,000 points (2,670 pixels/second). Temporary invincibility is currently ON: set `const invincible = false` in `game.js` to restore obstacle collisions. Coin collection and scoring continue normally. Validated speed cap, obstacle-contact immunity, grounded terrain, white-creature/fire rendering and rarity sampling in Chromium.
