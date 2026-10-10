@@ -202,3 +202,5 @@ Background rollback: restored the layout before river-clearance changes, elimina
 River-and-bridge crossings now use 8,400-background-pixel spacing instead of 2,800, reducing frequency by a factor of three. Mountains select one of ten subtle, stable shape profiles randomly per scenery slot. The bottom-left Pause/Resume button freezes the entire game and displays PAUSED while music keeps playing; paused time does not count toward gameplay events. Verified frozen game state, continuing music, Space safety, resume, and all ten mountain profiles in Chromium.
 
 Mountain shapes restored to their original setting. Temporary invincibility removed: hitting an obstacle ends the run again. Rarer rivers, pause/resume, and 75-second palette stages remain.
+
+On phones in portrait mode, an in-game banner at the top says “Turn your phone in landscape mode.” It disappears in landscape, while paused, and after game over. The welcome-screen message remains.

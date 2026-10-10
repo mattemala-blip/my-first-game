@@ -4,15 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rune Runner — One More Quest</title>
-  <link rel="stylesheet" href="style.css?v=matteo-40">
-  <script src="game.js?v=matteo-40" defer></script>
-  <script src="music.js?v=matteo-40" defer></script>
-  <script src="sounds.js?v=matteo-40" defer></script>
+  <link rel="stylesheet" href="style.css?v=portrait-41">
+  <script src="game.js?v=portrait-41" defer></script>
+  <script src="music.js?v=portrait-41" defer></script>
+  <script src="sounds.js?v=portrait-41" defer></script>
 </head>
 <body>
   <main>
     <header><div class="badge">✦ A TINY ENDLESS ADVENTURE</div><h1>Rune<span>Runner</span></h1><p class="credit">A game by Matteo Malacarne</p><p>Four heroes. A boundless forest. Infinite adventures.</p></header>
     <section class="game" aria-label="Rune Runner game">
+      <p id="portrait-reminder" class="portrait-reminder" role="status" hidden>Turn your phone in landscape mode</p>
       <div class="hud"><div>QUEST SCORE<strong id="score">0</strong></div><div>GOLD<strong id="gold">0</strong></div><div>BEST<strong id="best">0</strong></div></div>
       <canvas id="world" width="960" height="480" aria-label="Your chosen hero traveling through a changing magical land. Jump over crystals and slimes." tabindex="0"></canvas>
       <div class="overlay" id="overlay"><div class="card"><div class="icon">✦</div><h2 id="title">Your quest awaits</h2><p class="mobile-orientation">Turn your phone in landscape mode</p><p id="message">Leap over obstacles and collect gold.<br>Double jump to reach higher.</p><fieldset class="characters"><legend>Choose your adventurer</legend><label><input type="radio" name="hero" value="wizard" checked><span>🧙 Wizard</span></label><label><input type="radio" name="hero" value="elf"><span>🏹 Elf</span></label><label><input type="radio" name="hero" value="warrior"><span>⚔ Warrior</span></label><label><input type="radio" name="hero" value="accountant"><span>👓 Matteo</span></label></fieldset><button id="start">Start quest</button><small>SPACE / CLICK / TAP · TWICE TO DOUBLE JUMP</small></div></div>

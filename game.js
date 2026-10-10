@@ -10,6 +10,7 @@ const startButton = document.querySelector('#start');
 document.querySelector('input[value=accountant] + span').textContent = '👓 Matteo';
 const pauseButton = document.querySelector('#pause');
 const pauseScreen = document.querySelector('#pause-screen');
+const portraitReminder = document.querySelector('#portrait-reminder');
 const ground = 388;
 const player = { x: 155, y: ground - 54, width: 34, height: 54, velocity: 0 };
 let state = 'ready';
@@ -79,6 +80,7 @@ function startGame() {
   character = document.querySelector('input[name=hero]:checked').value;
   scoreLabel.textContent = goldLabel.textContent = '0';
   state = 'playing';
+  portraitReminder.hidden = false;
   overlay.hidden = true;
   pauseButton.hidden = false;
   pauseButton.textContent = 'Ⅱ Pause';
@@ -112,6 +114,7 @@ function jump() {
 }
 function endGame() {
   state = 'over';
+  portraitReminder.hidden = true;
   pauseButton.hidden = true;
   pauseScreen.hidden = true;
   best = Math.max(best, score);
@@ -130,6 +133,7 @@ function togglePause() {
   state = paused ? 'paused' : 'playing';
   previousTime = 0;
   pauseScreen.hidden = !paused;
+  portraitReminder.hidden = paused;
   pauseButton.textContent = paused ? '▶ Resume' : 'Ⅱ Pause';
   pauseButton.setAttribute('aria-pressed', String(paused));
   document.querySelector('#announcement').textContent = paused ? 'Game paused.' : 'Quest resumed.';
