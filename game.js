@@ -368,15 +368,16 @@ function drawLandscape() {
     const y=145+sceneryNoise(i,82)*55,flap=Math.sin(elapsed*6+i)*4;
     const color='#4b5268';
     for(let b=0;b<2;b++){
-      const bx=x+b*24,by=y+b*9;
+      const bx=x+b*18,by=y+b*7;
+      ctx.save();ctx.translate(bx,by);ctx.scale(0.75,0.75);ctx.translate(-bx,-by);
       polygon([[bx,by],[bx-12,by-7-flap],[bx-9,by+3],[bx-5,by],[bx,by+5],[bx+5,by],[bx+9,by+3],[bx+12,by-7-flap]],color);
-      circle(bx,by,3,color);
+      circle(bx,by,3,color);ctx.restore();
     }
   });
   sceneryItems(wildlifePreview ? 300 : 1800,0.08,(x,i)=>{
     if(!wildlifePreview && sceneryNoise(i,84)>0.06)return;
     const y=330,color='#222f3a';
-    ctx.save();ctx.translate(x,y);ctx.scale(0.65,0.65);
+    ctx.save();ctx.translate(x,y);ctx.scale(0.4875,0.4875);
     polygon([[-18,-10],[-12,-21],[12,-24],[25,-33],[33,-30],[42,-24],[32,-18],[21,-17],[17,-4],[-9,-4]],color);
     polygon([[27,-31],[25,-42],[34,-32]],color);
     polygon([[-13,-17],[-34,-30],[-27,-14],[-15,-7]],color);
@@ -598,6 +599,16 @@ function drawDragons() {
   const age=elapsed-lastDragonTime;if(age<0||age>24)return;
   const x=975-age*44,y=95+(dragonCount%3)*18+Math.sin(age*0.35)*7;
   const flap=Math.sin(age*2)*13,color='#46556b';
+  // Short, flickering fire-breath bursts; scenery only, never a hazard.
+  const breath = age % 6;
+  if (breath > 0.6 && breath < 2.9) {
+    const strength = Math.sin((breath-0.6)/2.3*Math.PI);
+    const reach = 18 + strength*30 + Math.sin(age*24)*3;
+    const mouthX=x+31,mouthY=y-3;
+    polygon([[mouthX,mouthY-2],[mouthX+reach*0.55,mouthY-8*strength],[mouthX+reach,mouthY-3],[mouthX+reach*0.8,mouthY+3],[mouthX+reach,mouthY+7],[mouthX+reach*0.4,mouthY+6*strength],[mouthX,mouthY+2]],'#ce7950');
+    polygon([[mouthX,mouthY-1],[mouthX+reach*0.7,mouthY-2],[mouthX+reach*0.5,mouthY+3],[mouthX,mouthY+1]],'#f2c579');
+  }
+
   polygon([[x-22,y],[x+17,y-3],[x+27,y-9],[x+33,y-4],[x+22,y+4],[x-18,y+6],[x-38,y+2]],color);
   polygon([[x-5,y],[x-26,y-24-flap],[x+2,y-13],[x+22,y-24-flap],[x+12,y+2]],color);
 }
