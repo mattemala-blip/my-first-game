@@ -171,8 +171,8 @@ function update(dt) {
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
     if (coin.high) {
-      if (coin.baseY === undefined) coin.baseY = coin.y;
-      coin.y = coin.baseY + Math.sin(elapsed * 2.5 + coin.x / 90) * 4;
+      if (coin.baseY === undefined) { coin.baseY = coin.y; coin.bobPhase = coin.x / 90; }
+      coin.y = coin.baseY + Math.sin(elapsed * 6 + coin.bobPhase) * 4;
     }
     if (overlaps(player, coin)) {
       if (coin.purple) bonusScore += 50000;

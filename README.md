@@ -133,6 +133,8 @@ Latest update: Elf narrowed another 10% (81% of its original width). Random char
 
 ## Original fantasy lo-fi music
 
-`music.js` synthesizes an original 72 BPM looping fantasy lo-fi track using the browser's Web Audio API: spacious pentatonic melody, warm chords, bass, and soft percussion. No audio files, external services, or copyrighted soundtrack samples are needed. Music starts with Start quest or Space. The Music on/off button toggles audio and remembers the preference locally. Hidden tabs suspend music; returning resumes it when enabled.
+`assets/fantasy-lofi.mp3` is an original rendered 72 BPM fantasy lo-fi loop, with a soft melody, chords, bass, and percussion. `music.js` plays it through native browser audio. No external audio services are needed. Click Start quest to begin music; use Music on/off to toggle it. Music starts enabled on each page visit, pauses in hidden tabs, and recovers on return or the next game click/tap. Browser playback restrictions show “Tap to play music” and allow retry without disabling audio.
 
-Validated audio-context startup on user gesture, mute/suspend, reload preference, unmute, and repeated jumping without extra audio contexts in Chromium. Sound synthesis works locally; audio taste and volume can be adjusted in `music.js`.
+Validated MP3 decoding and non-silent samples, advancing playback time, mute/unmute, recovery after blocked playback and navigation, and no browser errors in Chromium. Device mute and browser sound permissions still control whether playback can be heard.
+
+Latest update: sky coins bob at a steady, faster rate (6 radians/second, ±4 pixels), independent of running speed. Music replaced with the native audio player and bundled original MP3.
