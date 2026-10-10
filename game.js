@@ -118,25 +118,32 @@ function overlaps(a, b) {
 }
 // Speed steps depend on this run's score, including collected gold.
 function speedForScore(points) { return 270 + Math.floor(points / 500) * 8; }
-function spawnPattern(speed) {
-  const pattern = Math.floor(Math.random() * 5);
-  const startX = 990 + Math.random() * 90;
-  const kinds = ['slime', 'crystal', 'spikes', 'mushroom', 'skull', 'stump', 'chest', 'gargoyle', 'cauldron', 'thorn'];
-  const kind = kinds[Math.floor(Math.random() * kinds.length)];
+const obstacleKinds = ['slime','crystal','spikes','mushroom','skull','stump','chest','gargoyle','cauldron','thorn'];
+const obstacleSizes = [0.75, 1, 1.25];
+function makeObstacle(x, kind = obstacleKinds[Math.floor(Math.random()*obstacleKinds.length)]) {
+  const size = obstacleSizes[Math.floor(Math.random()*obstacleSizes.length)];
   const slime = kind === 'slime';
-  // Short clusters fit comfortably inside a single jump at the starting speed.
-  const count = pattern === 1 ? 2 : 1;
-  for (let i = 0; i < count; i++) {
-    obstacles.push({ x: startX + i * 58, y: ground - (slime ? 34 : 48), width: slime ? 42 : 30, height: slime ? 34 : 48, slime, kind });
+  const height = (slime ? 34 : 48) * size;
+  return {x,y:ground-height,width:(slime?42:30)*size,height,slime,kind,size};
+}
+function spawnPattern(speed) {
+  const count = Math.random() < 0.35 ? 2 : 1;
+  const startX = 990 + Math.random()*140;
+  let x = startX;
+  for(let i=0;i<count;i++) {
+    const obstacle=makeObstacle(x);
+    obstacles.push(obstacle);
+    x += obstacle.width + 18 + Math.random()*20;
   }
-  const high = pattern === 3 || (pattern === 4 && Math.random() < 0.5);
-  const coinCount = pattern === 2 ? 0 : 1 + Math.floor(Math.random() * 4);
-  const coinStart = startX - 35 + Math.random() * 90;
-  for (let i = 0; i < coinCount; i++) {
-    coins.push({ x: coinStart + i * 36, y: ground - (high ? 222 + Math.random() * 12 : 94 + Math.sin(i * 0.9) * 25), width: 22, height: 22, high });
+  const coinCount = Math.random()<0.2 ? 0 : 1+Math.floor(Math.random()*5);
+  let coinX = startX - 70 + Math.random()*160;
+  for(let i=0;i<coinCount;i++) {
+    const level = Math.floor(Math.random()*3);
+    const height = [100,165,230][level] + (Math.random()-0.5)*14;
+    coins.push({x:coinX,y:ground-height,width:22,height:22,high:level===2,level});
+    coinX += 30 + Math.random()*22;
   }
-  // Time-based clearance still allows landing at higher speeds; include cluster width.
-  nextSpawn = 1.2 + Math.random() * 1.25 + count * 58 / speed;
+  nextSpawn = 1.2 + Math.random()*1.25 + (x-startX)/speed;
 }
 function update(dt) {
   elapsed += dt;
@@ -436,6 +443,12 @@ function drawSpeech() {
   ctx.fillStyle = '#33324b';ctx.fillText(speech,x+14,y+24,width-28);
 }
 function drawObstacle(o) {
+  const size=o.size || 1;
+  ctx.save();ctx.translate(o.x,ground);ctx.scale(size,size);ctx.translate(-o.x,-ground);
+  drawObstacleArt({...o,y:ground-(o.slime?34:48)});
+  ctx.restore();
+}
+function drawObstacleArt(o) {
   const x=o.x,y=o.y, kind=o.kind || (o.slime?'slime':'crystal');
   if(kind==='slime') { ctx.fillStyle='#c66cbd';ctx.beginPath();ctx.ellipse(x+21,y+20,23,20,0,Math.PI,2*Math.PI);ctx.lineTo(x+44,ground);ctx.lineTo(x-2,ground);ctx.fill();rect(x+10,y+15,5,7,'#392642');rect(x+27,y+15,5,7,'#392642'); }
   else if(kind==='crystal'){polygon([[x+15,y],[x+30,y+24],[x+24,ground],[x+3,ground],[x,y+24]],'#b99aff');rect(x+12,y+17,5,26,'#e5ccff');}
@@ -508,6 +521,6 @@ function spawnTreasureChallenge(type) {
   const layout=options[challenge], speed=speedForScore(score), coinX=Math.max(930,player.x+speed*1.8);
   coins.push({x:coinX,y:ground-layout.height,width:22,height:22,[type]:true,challenge});
   const kinds=['spikes','thorn','gargoyle','crystal'];
-  for(const offset of layout.offsets) obstacles.push({x:coinX+offset*speed,y:ground-48,width:30,height:48,kind:kinds[Math.floor(Math.random()*kinds.length)],treasure:true});
+  for(const offset of layout.offsets) obstacles.push({...makeObstacle(coinX+offset*speed,kinds[Math.floor(Math.random()*kinds.length)]),treasure:true});
   nextSpawn=Math.max(nextSpawn,2.2);
 }

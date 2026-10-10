@@ -154,3 +154,9 @@ The mobile landscape instruction now uses a large, bright mint banner with bold 
 Validated exactly 900 seconds of decoded audio, distinct content across all five songs, non-silent transitions, playback across all four internal boundaries and the loop back to song one, and mobile banner/start controls. The soundtrack is about 11 MB.
 
 The reproducible composer is `scripts/render_soundtrack.py` (Python with NumPy); it renders `/tmp/rune-suite.wav`. Encode with `ffmpeg -i /tmp/rune-suite.wav -codec:a libmp3lame -b:a 96k assets/fantasy-lofi.mp3`. These tools are only needed to regenerate music; playing requires only a browser.
+
+## Random obstacle sizes and middle coins
+
+All ten obstacle types now randomly use small (75%), medium (100%), or large (125%) size, with collision boxes scaled alongside the artwork. Normal obstacle groups mix random types/sizes and spacing. Gold coins randomly appear at low, middle, and sky heights with varied counts and horizontal gaps; sky coins keep bobbing. Treasure challenges also use random obstacle sizes.
+
+Validated all three sizes, ten types, three coin-height bands, randomized placements, ground alignment, rendering, and collectibility of all treasure challenge layouts at three representative speeds in Chromium.
