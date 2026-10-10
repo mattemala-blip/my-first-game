@@ -170,6 +170,10 @@ function update(dt) {
   }
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
+    if (coin.high) {
+      if (coin.baseY === undefined) coin.baseY = coin.y;
+      coin.y = coin.baseY + Math.sin(elapsed * 2.5 + coin.x / 90) * 4;
+    }
     if (overlaps(player, coin)) {
       if (coin.purple) bonusScore += 50000;
       else gold += coin.blue ? 20 : 1;
@@ -204,7 +208,7 @@ function draw() {
   drawGrass();
   for (const coin of coins) {
     if (coin.blue || coin.purple) { ctx.save();ctx.shadowColor=coin.purple?'#bb69ff':'#58caff';ctx.shadowBlur=18;circle(coin.x+11,coin.y+11,14,coin.purple?'#d9a3ff':'#78ddff');ctx.restore(); }
-    else if (coin.high) circle(coin.x+11,coin.y+11,17,'#b99aff55');
+
     circle(coin.x+11,coin.y+11,12,coin.purple?'#d9a3ff':coin.blue?'#78ddff':'#ffcf65');
     circle(coin.x+11,coin.y+11,8,coin.purple?'#8a45bb':coin.blue?'#297ac5':'#c98732');
     if(coin.purple){ctx.font='bold 8px system-ui';ctx.fillStyle='#fff0ff';ctx.fillText('★',coin.x+7,coin.y+14);}
