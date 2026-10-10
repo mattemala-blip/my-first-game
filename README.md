@@ -8,7 +8,7 @@ Open `index.html` in your browser and choose **Wizard**, **Elf**, **Warrior**, o
 
 - Press **Space**, click the game, or tap it on your phone to jump. Press/click/tap again in the air for a magic double jump. Two quick clicks work; you get two jumps before you must land.
 - Glowing high coins can only be collected with a double jump. Time your second jump shortly after the first to rise higher.
-- Travel through slowly changing forests, mountain ranges, and castle lands. Moonlit colors and terrain blend through 30 distinct minute-long chapters, with no palette cycle in the first 20 minutes. Scenery is generated from world positions instead of a repeating short sequence.
+- Travel through slowly changing forests, mountain ranges, and castle lands. Moonlit colors and terrain blend through 30 distinct 90-second chapters, with no palette cycle in the first 20 minutes. Scenery is generated from world positions instead of a repeating short sequence.
 - Jump over pink slimes and purple crystals. Touching an obstacle ends the quest.
 - Collect gold during jumps: each coin adds 50 points. Running also adds points.
 - Speed increases by 8 pixels per second every 500 points (including gold bonuses). Try to beat your best score!
@@ -77,7 +77,7 @@ The character and landscape update was also tested in Chromium: four character s
 
 ## Character effects and living scenery
 
-The four names are **Wizard**, **Elf**, **Warrior**, and **World Banker**. The Wizard double-jumps with sparkles; the Elf moves both legs without particles; the Warrior moves sword and shield without particles; the World Banker throws papers upward. All retain identical jump physics. The World Banker has two visible eyes behind glasses.
+The four names are **Wizard**, **Elf**, **Warrior**, and **World Banker**. The Wizard double-jumps with sparkles; the Elf spins around without particles; the Warrior moves sword and shield without particles; the World Banker throws papers upward. All retain identical jump physics. The World Banker has two visible eyes behind glasses.
 
 Scenery is drawn with fully opaque shapes: slowly changing mountains and rolling countryside, rivers with bridges, evergreen trees and orchards, castles, manors, cottages, fences, windmills, fields, sheep, deer, clouds, and flapping birds. Objects scroll into view instead of fading through one another.
 
@@ -86,3 +86,11 @@ Validated the new labels and each character's jump pose/effect in Chromium, and 
 Obstacle types, single/paired clusters, spacing, and coin counts, heights, and offsets are randomized each run. Patterns include coin-free challenges and high double-jump rewards. Spawn spacing leaves time to land between obstacle groups.
 
 Latest validation: Chromium checks for character-specific particles/poses, 500-point speed thresholds, 21 distinct minute palettes, gradual transitions, varied random patterns, jump physics, and mobile double-jump/restart. An accelerated 20-minute simulation (collisions bypassed for long-run inspection) completed with finite positions and bounded object counts. Live GitHub Pages deployment is separate from these local checks.
+
+## Gloomy forest update
+
+Dense, solid evergreen silhouettes frame occasional distant landmarks. Rivers, buildings, animals and birds are spaced farther apart; the 30 slowly blending regions now form a 45-minute palette cycle. The World Banker throws five larger paper sheets with folded corners and written lines.
+
+Ten randomly selected fantasy obstacles: slimes, crystals, spikes, cursed mushrooms, skulls, stumps, treasure chests, gargoyles, cauldrons, and thorns. Every 10,000 points, a four-second speech bubble shows a different running complaint, also announced for screen readers. Restart resets the milestone counter.
+
+Validated all obstacle drawing paths, milestone messages and threshold stability, upward paper movement, particle-free Elf spin, mobile jump/restart, and another accelerated 20-minute run in Chromium.
