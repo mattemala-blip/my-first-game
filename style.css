@@ -25,3 +25,12 @@ footer { display: flex; justify-content: space-between; gap: 12px; padding: 20px
 .hint { font-size: 12px; color: #887e9d; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @media (max-width: 600px) { main { padding: 18px 0; } footer { flex-wrap: wrap; justify-content: center; } canvas { min-height: 320px; object-fit: fill; } .hud { inset: 14px 16px auto; } .card p { font-size: 13px; } }
+
+.characters { border: 0; padding: 0; margin: 0 auto 18px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 500px; }
+.characters legend { font-size: 12px; color: #d1c3e8; margin: 0 auto 10px; }
+.characters label { cursor: pointer; }
+.characters input { position: absolute; opacity: 0; }
+.characters span { display: block; padding: 9px 12px; border: 1px solid #84709d; border-radius: 10px; background: #25243b; font-size: 12px; }
+.characters input:checked + span { border-color: #7ef3c1; background: #294d49; color: #b9ffdf; }
+.characters input:focus-visible + span { outline: 2px solid white; outline-offset: 3px; }
+@media (max-width: 600px) { canvas { min-height: 420px; } .card { padding: 10px; } .card p { margin: 8px 0 12px; } .icon { font-size: 24px; } small { letter-spacing: 1px; margin-top: 14px; } }

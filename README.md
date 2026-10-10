@@ -4,9 +4,11 @@ A colorful, endless fantasy runner made with plain HTML, CSS, and JavaScript. No
 
 ## Play
 
-Open `index.html` in your browser and click **Start quest** (or press Space).
+Open `index.html` in your browser and choose **Wizard**, **Elf archer**, **Warrior**, or **Accountant**, then click **Start quest** (or press Space). All characters have the same abilities.
 
-- Press **Space**, click the game, or tap it on your phone to jump.
+- Press **Space**, click the game, or tap it on your phone to jump. Press/click/tap again in the air for a magic double jump. Two quick clicks work; you get two jumps before you must land.
+- Glowing high coins can only be collected with a double jump. Time your second jump shortly after the first to rise higher.
+- Travel through slowly changing forests, mountain ranges, and castle lands. Colors and scenery blend over roughly a minute per region, with no abrupt scene changes.
 - Jump over pink slimes and purple crystals. Touching an obstacle ends the quest.
 - Collect gold during jumps: each coin adds 50 points. Running also adds points.
 - The game gradually speeds up. Try to beat your best score!
@@ -70,3 +72,5 @@ Change the starting speed (`270`), maximum speed (`470`), jump velocity (`-650`)
 ## Validation
 
 Tested in headless Chromium: starting, Space/click/tap jumps, coin collection and score, obstacle collision, game-over screen, restart, high-score persistence, natural obstacle spawning, and mobile layout. JavaScript syntax also passed `node --check game.js`.
+
+The character and landscape update was also tested in Chromium: four character selections; mouse, keyboard, and touch double jumps; a third jump prevented; landing and restart reset jumps; high coins missed by a single jump and collected with a double jump; smooth region transitions; mobile character-menu layout.
