@@ -25,7 +25,10 @@ const complaints = [
 ];
 let previousComplaint = '';
 let effectVariant = 0;
-const variantCounts = { wizard: 50, warrior: 50, elf: 5, accountant: 30 };
+let nextBlueTime = 0;
+const paperHeadings = ['BUDGET','REPORT','GDP','LOANS','DATA','PLAN','AUDIT','GRANTS','TRADE','CLIMATE','HEALTH','SCHOOLS','ROADS','WATER','ENERGY','GROWTH','JOBS','BONDS','TAX','FORECAST','POVERTY','FUNDS','RISKS','SAVINGS','PROJECT'];
+function blueInterval() { return 120 + Math.random() * 180; }
+const variantCounts = { wizard: 50, warrior: 30, elf: 5, accountant: 150 };
 // Explicit combinations give exactly the requested number of distinct effects.
 const wizardPalettes = [
   ['#fff3b0','#ffc76e'], ['#cbb4ff','#936eff'], ['#84ffe0','#35ceb8'],
@@ -49,6 +52,7 @@ bestLabel.textContent = best;
 function startGame() {
   elapsed = distance = gold = score = 0;
   nextSpawn = 1.5;
+  nextBlueTime = blueInterval();
   obstacles = []; coins = []; particles = [];
   player.y = ground - player.height;
   player.velocity = 0;
@@ -70,16 +74,18 @@ function jump() {
   if (!magic) return;
   jumpEffect = 0.6;
   effectVariant = chooseVariant(character);
-  const count = character === 'wizard' ? 24 : character === 'accountant' ? 3 + effectVariant % 5 : 0;
+  const throwStyle = effectVariant % 6;
+  const documentSet = Math.floor(effectVariant / 6);
+  const count = character === 'wizard' ? 24 : character === 'accountant' ? 3 + throwStyle % 5 : 0;
   for (let i = 0; i < count; i++) {
     const paper = character === 'accountant';
     particles.push({ x: player.x + 20, y: player.y + 20,
-      vx: paper ? (Math.floor(effectVariant / 5) - 2.5) * 40 + (Math.random() - 0.5) * 80 : (Math.random() - 0.5) * 240,
+      vx: paper ? (throwStyle - 2.5) * 40 + (Math.random() - 0.5) * 80 : (Math.random() - 0.5) * 240,
       vy: paper ? -180 - Math.random() * 160 : (Math.random() - 0.5) * 180,
       life: paper ? 1.2 : 0.7, color: wizardPalettes[Math.floor(effectVariant / 5) % 10][i % 2],
       magic: true, effect: character, shape: effectVariant % 5,
-      size: paper ? 0.8 + (effectVariant % 3) * 0.2 : 1,
-      document: Math.floor(effectVariant / 5), rotation: Math.random() * Math.PI });
+      size: paper ? 0.8 + (throwStyle % 3) * 0.2 : 1,
+      document: (documentSet + i) % paperHeadings.length, rotation: Math.random() * Math.PI });
   }
 }
 function endGame() {
@@ -126,13 +132,15 @@ function spawnPattern(speed) {
   for (let i = 0; i < coinCount; i++) {
     coins.push({ x: coinStart + i * 36, y: ground - (high ? 222 + Math.random() * 12 : 94 + Math.sin(i * 0.9) * 25), width: 22, height: 22, high });
   }
-  // A 0.5% chance per obstacle group: roughly one blue coin per 200 groups.
-  if (Math.random() < 0.005) coins.push({ x: startX + 170, y: ground - 120, width: 22, height: 22, blue: true });
   // Time-based clearance still allows landing at higher speeds; include cluster width.
   nextSpawn = 1.2 + Math.random() * 1.25 + count * 58 / speed;
 }
 function update(dt) {
   elapsed += dt;
+  if (elapsed >= nextBlueTime) {
+    coins.push({ x: 930, y: ground - 120, width: 22, height: 22, blue: true });
+    nextBlueTime = elapsed + blueInterval();
+  }
   jumpEffect = Math.max(0, jumpEffect - dt);
   speechTime = Math.max(0, speechTime - dt);
   const speed = speedForScore(score);
@@ -348,6 +356,10 @@ function drawCharacter(x, y, hero) {
     if(effectVariant===4)ctx.scale(Math.max(0.2,Math.abs(Math.cos(progress*Math.PI*2))),1);
     ctx.translate(-x-22,-y-27);
   }
+  if (hero === 'warrior' && pose && effectVariant >= 24) {
+    const progress=1-jumpEffect/0.6,flip=effectVariant-24;
+    ctx.translate(x+22,y+27);ctx.rotate(progress*Math.PI*2*(flip%2?-1:1)*(1+Math.floor(flip/2)));ctx.translate(-x-22,-y-27);
+  }
   const outfits = { wizard: '#8459ce', elf: '#52966a', warrior: '#a7b9d0', accountant: '#50607d' };
   rect(x + 4, y + 28, 28, 22, outfits[hero]);
   rect(x + 8, y + 45 - bob, 9, 9, '#322c58');rect(x + 23, y + 45 - bob, 9, 9, '#322c58');
@@ -365,18 +377,15 @@ function drawCharacter(x, y, hero) {
     rect(x + 29, y + 28, 29, 2, '#f7e6bd');
   } else if (hero === 'warrior') {
     rect(x + 5, y + 6, 31, 12, '#cedae8'); rect(x + 8, y + 17, 6, 12, '#8798b2'); rect(x + 20, y - 3, 7, 10, '#e5809d');
-    if (pose) {
-      ctx.strokeStyle='#a7b9d0';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x+30,y+32);ctx.lineTo(x+41+motion*(12+Math.floor(effectVariant/10)*5),y+43);ctx.stroke();
-    }
-    ctx.save();
-    if (pose) {
-      const angle=effectVariant%10, style=Math.floor(effectVariant/10);
-      ctx.translate(x+41+motion*(12+style*5),y+40);
-      ctx.rotate((0.75+angle*0.13)*motion);ctx.translate(-x-41,-y-40);
-    }
-    rect(x + 38, y + 9, 6, 31, '#e6f2ff'); rect(x + 32, y + 37, 18, 4, '#ffdc7c'); rect(x + 39, y + 41, 4, 10, '#a37459');
-    ctx.restore();
-    ctx.save();const shieldStyle=Math.floor(effectVariant/10),shieldAngle=effectVariant%10;ctx.translate(x+3+(pose?motion*(5+shieldStyle*4):0),y+37-(pose?motion*(6+shieldAngle*2):0));ctx.rotate(pose?motion*(shieldStyle-2)*0.3:0);ctx.scale(pose?1-motion*(0.1+shieldStyle*0.08):1,1);circle(0,0,13,'#7c8fa9');circle(0,0,8,'#ebc872');ctx.restore();
+    // 24 slashes: 8 directions × 3 swing styles; 6 whole-body flips.
+    const move = warriorMove(effectVariant, jumpEffect);
+    const armAngle = pose && effectVariant < 24 ? move.sword : 0;
+    const grip = warriorGrip(x, y, armAngle);
+    ctx.strokeStyle='#a7b9d0';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x+30,y+32);ctx.lineTo(grip.x,grip.y);ctx.stroke();
+    ctx.save();ctx.translate(x+30,y+32);ctx.rotate(armAngle);ctx.translate(11,8);
+    rect(-3,-34,6,31,'#e6f2ff');rect(-9,-6,18,4,'#ffdc7c');rect(-2,-2,4,10,'#a37459');ctx.restore();
+    ctx.save();ctx.translate(x+8,y+30);ctx.rotate(pose && effectVariant<24?move.shield:0);ctx.translate(-5,7);
+    circle(0,0,13,'#7c8fa9');circle(0,0,8,'#ebc872');ctx.restore();
   } else {
     rect(x + 7, y + 7, 28, 9, '#5b3f35'); rect(x + 17, y + 28, 8, 19, '#f4f0e5'); rect(x + 20, y + 31, 3, 14, '#ef8a9e');
     // Two visible pupils inside two lenses.
@@ -427,7 +436,7 @@ function drawPaper(p) {
   ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rotation+p.life*4);ctx.scale(p.size,p.size);
   rect(-10,-13,20,26,'#fff9e9');polygon([[4,-13],[10,-7],[4,-7]],'#b6c8d6');
   ctx.fillStyle='#657c98';ctx.font='bold 5px system-ui';
-  const headings=['BUDGET','REPORT','GDP','LOANS','DATA','PLAN'];ctx.fillText(headings[p.document],-8,-5);
+  ctx.font='bold 4px system-ui';ctx.fillText(paperHeadings[p.document],-8,-5,16);
   if(p.document%3===0){for(let i=0;i<3;i++)rect(-6+i*5,8-i*3,3,3+i*3,'#657c98');}
   else if(p.document%3===1){for(let i=0;i<3;i++)rect(-6,1+i*4,12-i*2,1,'#657c98');}
   else {ctx.strokeStyle='#657c98';ctx.lineWidth=0.7;ctx.strokeRect(-6,0,12,9);rect(-6,4,12,1,'#657c98');rect(-1,0,1,9,'#657c98');}
@@ -439,4 +448,16 @@ function drawGrass() {
     const x=i*16-offset,height=3+sceneryNoise(i,61)*9,lean=sceneryNoise(i,62)*7-3;
     polygon([[x-2,ground+1],[x+lean,ground-height],[x+2,ground+1]],i%2?'#578f72':'#72aa83');
   }
+}
+
+function warriorMove(variant, remaining) {
+  const progress = 1 - remaining / 0.6;
+  const direction = (variant % 8) * Math.PI / 4;
+  const style = Math.floor(variant / 8);
+  const swing = style === 0 ? Math.sin(progress * Math.PI) : style === 1 ? Math.sin(progress * Math.PI * 2) : Math.sin(progress * Math.PI) ** 2;
+  return { sword: (direction + 0.8) * swing, shield: (style - 1) * swing * 0.8 + Math.sin(direction) * swing * 0.4 };
+}
+function warriorGrip(x, y, angle) {
+  // The arm always has the same length; only its angle changes.
+  return { x: x + 30 + 11 * Math.cos(angle) - 8 * Math.sin(angle), y: y + 32 + 11 * Math.sin(angle) + 8 * Math.cos(angle) };
 }

@@ -97,10 +97,12 @@ Validated all obstacle drawing paths, milestone messages and threshold stability
 
 ## Random effects and rare treasure
 
-Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 50 forward sword/shield combinations (10 slash angles × 5 movement styles), Elf has 5 flip styles, and World Banker has 30 paper-throw combinations (5 paper counts × 6 document/direction styles, with varied sizes). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
+Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 30 moves (24 directional slashes and 6 flips), Elf has 5 flip styles, and World Banker has 150 paper-throw combinations (25 document sets × 6 throw styles, with varied counts, sizes, and directions). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
 
 Milestone dialogue randomly picks from 24 complaints and avoids immediately repeating the previous line, including across restarts. Grass blades replace the colorful ground dots. The title credit reads “A game by Matteo Malacarne.”
 
-A glowing blue coin has a 0.5% chance to appear per obstacle group and awards 20 gold (1,000 score points). This is random, with no guaranteed interval.
+A glowing blue coin appears repeatedly at random intervals of 120–300 seconds of active gameplay and awards 20 gold (1,000 score points). The first appears 2–5 minutes after starting; restarting resets its schedule. Background-tab time does not count.
 
 Validated all 135 effect variants in Chromium, distinct Wizard/paper combinations, random milestone selection, rare-coin spawn branches and reward, credit, mobile controls/layout/restart, and browser-error-free drawing.
+
+Latest refinement: each sheet in a paper throw has a distinct heading, chosen from 25 document subjects. Warrior slashes rotate a fixed-length arm in different directions, with six flips as alternatives. Browser checks rendered all 150 paper combinations and 30 Warrior moves, verified exact page text, and simulated 20 minutes with recurring blue coins and 2–5 minute gaps.
