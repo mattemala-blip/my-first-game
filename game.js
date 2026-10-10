@@ -14,7 +14,7 @@ let jumps = 0;
 let jumpEffect = 0;
 let nextDragonTime = Infinity, lastDragonTime = -Infinity, dragonCount = 0;
 // Temporary creature showcase. Set false to restore the exact normal rarity.
-const wildlifePreview = true;
+const wildlifePreview = false;
 function firstDragonDelay() { return wildlifePreview ? 2 : 180 + Math.random()*300; }
 function dragonInterval() { return wildlifePreview ? 26 : 300 + Math.random()*180; }
 function updateDragonSchedule() {
