@@ -144,3 +144,13 @@ Latest update: sky coins bob at a steady, faster rate (6 radians/second, ±4 pix
 The original soundtrack is now a full 180-second arrangement at 72 BPM, with an introduction, main theme, open-landscape section, brighter variation, quiet bridge, and homecoming. Notes wrap across the loop boundary rather than ending with silence. Browser tests verified exact decoded duration, varying section content, and native playback crossing the loop boundary.
 
 On devices with a touch-oriented primary pointer, the welcome screen displays “Turn your phone in landscape mode.” Verified on a mobile browser viewport, with the message hidden on desktop.
+
+## Five-song fantasy lo-fi suite
+
+The soundtrack now contains five original three-minute compositions in one continuous 15-minute audio file: Moonlit Trail, Elven Lanterns, Mountain Watch, Forgotten Kingdom, and Homeward Stars. Each has a distinct melody and chord progression, with evolving sections. Sustained notes carry across song boundaries, and the end wraps into song one without a silent gap. All remain at 72 BPM in a compatible fantasy lo-fi style.
+
+The mobile landscape instruction now uses a large, bright mint banner with bold text. Extra mobile canvas height keeps menu controls visible.
+
+Validated exactly 900 seconds of decoded audio, distinct content across all five songs, non-silent transitions, playback across all four internal boundaries and the loop back to song one, and mobile banner/start controls. The soundtrack is about 11 MB.
+
+The reproducible composer is `scripts/render_soundtrack.py` (Python with NumPy); it renders `/tmp/rune-suite.wav`. Encode with `ffmpeg -i /tmp/rune-suite.wav -codec:a libmp3lame -b:a 96k assets/fantasy-lofi.mp3`. These tools are only needed to regenerate music; playing requires only a browser.

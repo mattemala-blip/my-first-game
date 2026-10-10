@@ -2,7 +2,7 @@
 // and recovery on browsers that suspend sound until the next user gesture.
 (() => {
   const button = document.querySelector('#music-toggle');
-  const audio = new Audio('assets/fantasy-lofi.mp3?v=2');
+  const audio = new Audio('assets/fantasy-lofi.mp3?v=3');
   audio.loop = true;
   audio.preload = 'auto';
   audio.volume = 0.35;
