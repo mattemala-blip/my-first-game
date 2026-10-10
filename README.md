@@ -174,3 +174,5 @@ Validated complaint thresholds, bobbing for all coin categories, all creature/ca
 Wildlife now has ten regular forest species: wolf, fox, stag, doe, elk, bear, boar, badger, hare, and lynx. Every restart picks a new scenery seed and world starting offset, shuffles the 30 landscape chapters, and chooses a different starting point within the first chapter. Background variety changes independently of score and gameplay distance; transitions remain gradual.
 
 Validated ten animal drawing paths, six distinct restart scenery seeds/starts/orders, smooth chapter boundaries, and score/distance resets in Chromium.
+
+Latest scenery update: ground animals removed. Distant birds and three per-run dragon windows remain. Rare pairs of bats appear in widely spaced sky slots with a 6% chance per slot, substantially less frequently than birds. Checked 150 scenery samples in Chromium without browser errors.

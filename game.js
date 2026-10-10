@@ -350,6 +350,17 @@ function drawLandscape() {
     if(sceneryNoise(i,72)<0.025) drawWizardTower(x,326,Math.floor(sceneryNoise(i,73)*3));
   });
   drawDragons();
+  // Widely separated slots with a low chance make bats much rarer than birds.
+  sceneryItems(1800,0.08,(x,i)=>{
+    if(sceneryNoise(i,81)>0.06)return;
+    const y=145+sceneryNoise(i,82)*55,flap=Math.sin(elapsed*6+i)*4;
+    const color='#4b5268';
+    for(let b=0;b<2;b++){
+      const bx=x+b*24,by=y+b*9;
+      polygon([[bx,by],[bx-12,by-7-flap],[bx-9,by+3],[bx-5,by],[bx,by+5],[bx+5,by],[bx+9,by+3],[bx+12,by-7-flap]],color);
+      circle(bx,by,3,color);
+    }
+  });
   sceneryItems(85, 0.22, (x, i) => {
     const variation = (Math.sin(i * 4.7)+1)/2;
     const size = 42 + land.forest*45 + variation*24;
@@ -357,9 +368,6 @@ function drawLandscape() {
     rect(x+19,base-size,8,size,'#86644b');
     if(sceneryNoise(i,22)<0.72) polygon([[x+23,base-size*2],[x-10,base-15],[x+56,base-15]],rgb(land.trees));
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
-  });
-  sceneryItems(1250,0.18,(x,i)=>{
-    drawAnimal(x,372,Math.floor(sceneryNoise(i,71)*animals.length));
   });
   sceneryItems(600,0.06,(x,i)=>{
     const y=135+Math.sin(i*3)*32;
@@ -534,29 +542,6 @@ function spawnTreasureChallenge(type) {
 
 function complaintCountAt(seconds) {
   return seconds < 180 ? 0 : seconds < 360 ? 1 : 2 + Math.floor((seconds-360)/120);
-}
-// Twenty distinct species, with silhouettes suited to a mythical forest.
-const animals = [
- ['Wolf','canine','#7c8795'],['Fox','canine','#a67862'],
- ['Stag','deer','#a08a74'],['Doe','deer','#b49a80'],['Elk','deer','#8b7967'],
- ['Bear','bear','#77706b'],['Boar','bear','#686e72'],['Badger','bear','#96999b'],
- ['Hare','rabbit','#a49b94'],['Lynx','cat','#a3967e']
-];
-function drawAnimal(x,y,index) {
- const [name,shape,color]=animals[index];
- ctx.save();ctx.translate(x,y);ctx.scale(0.85,0.85);
- const bulk=shape==='bear'?1.25:1;
- ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(12,-14,16*bulk,8*bulk,0,0,Math.PI*2);ctx.fill();
- const neck=shape==='deer';
- rect(24,-(neck?33:23),7,neck?24:14,color);circle(30,neck?-33:-22,6,color);
- for(const leg of [1,10,20,27])rect(leg,-9,3,10,color);
- circle(33,neck?-34:-23,1,'#293242');
- if(shape==='canine'||shape==='cat'){polygon([[25,-25],[24,-34],[30,-28]],color);polygon([[4,-16],[-13,-26],[-5,-15],[0,-10]],color);}
- if(shape==='deer'&&name!=='Doe'){ctx.strokeStyle=color;ctx.lineWidth=2;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(28,-36);ctx.lineTo(28+side*9,-49);ctx.lineTo(28+side*14,-46);ctx.moveTo(28+side*6,-45);ctx.lineTo(28+side*6,-52);ctx.stroke();}}
- if(shape==='bear'){circle(27,-28,3,color);if(name==='Boar')polygon([[33,-20],[40,-24],[38,-17]],'#c9c4ac');if(name==='Badger')rect(29,-27,3,11,'#d0d0bd');}
- if(shape==='rabbit'){rect(24,-42,4,18,color);rect(31,-39,4,15,color);circle(-2,-13,5,color);}
- if(name==='Lynx')for(let k=0;k<4;k++)circle(k*7,-16,1.5,'#635c59');
- ctx.restore();
 }
 function drawCastle(x,y,variant,land) {
  const family=Math.floor(variant/5),detail=variant%5;
