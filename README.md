@@ -8,10 +8,10 @@ Open `index.html` in your browser and choose **Wizard**, **Elf**, **Warrior**, o
 
 - Press **Space**, click the game, or tap it on your phone to jump. Press/click/tap again in the air for a magic double jump. Two quick clicks work; you get two jumps before you must land.
 - Glowing high coins can only be collected with a double jump. Time your second jump shortly after the first to rise higher.
-- Travel through slowly changing forests, mountain ranges, and castle lands. Colors and scenery blend over roughly a minute per region, with no abrupt scene changes.
+- Travel through slowly changing forests, mountain ranges, and castle lands. Moonlit colors and terrain blend through 30 distinct minute-long chapters, with no palette cycle in the first 20 minutes. Scenery is generated from world positions instead of a repeating short sequence.
 - Jump over pink slimes and purple crystals. Touching an obstacle ends the quest.
 - Collect gold during jumps: each coin adds 50 points. Running also adds points.
-- The game gradually speeds up. Try to beat your best score!
+- Speed increases by 8 pixels per second every 500 points (including gold bonuses). Try to beat your best score!
 - Click **Restart quest**, or press Space on the game-over screen, to try again.
 
 Your best score is saved in this browser when browser storage is available. There is no shared leaderboard.
@@ -67,7 +67,7 @@ Suggested message:
 - `style.css`: colors, layout, and responsive styling.
 - `game.js`: drawing, jumping physics, random obstacles, coins, score, and collisions.
 
-Change the starting speed (`270`), maximum speed (`470`), jump velocity (`-650`), or gravity (`1700`) in `game.js` to adjust difficulty. Graphics are drawn with Canvas, so there are no missing image assets or external fonts.
+Change the starting speed (`270`), speed step (`8` in `speedForScore`), jump velocity (`-650`), or gravity (`1700`) in `game.js` to adjust difficulty. Graphics are drawn with Canvas, so there are no missing image assets or external fonts.
 
 ## Validation
 
@@ -77,8 +77,12 @@ The character and landscape update was also tested in Chromium: four character s
 
 ## Character effects and living scenery
 
-The four names are **Wizard**, **Elf**, **Warrior**, and **World Banker**. The Wizard double-jumps with sparkles; the Elf kicks a leg with a leaf trail; the Warrior swings a sword with metallic streaks; the World Banker raises an arm with fluttering papers. All retain identical jump physics. The World Banker has two visible eyes behind glasses.
+The four names are **Wizard**, **Elf**, **Warrior**, and **World Banker**. The Wizard double-jumps with sparkles; the Elf moves both legs without particles; the Warrior moves sword and shield without particles; the World Banker throws papers upward. All retain identical jump physics. The World Banker has two visible eyes behind glasses.
 
 Scenery is drawn with fully opaque shapes: slowly changing mountains and rolling countryside, rivers with bridges, evergreen trees and orchards, castles, manors, cottages, fences, windmills, fields, sheep, deer, clouds, and flapping birds. Objects scroll into view instead of fading through one another.
 
 Validated the new labels and each character's jump pose/effect in Chromium, and checked that scenery drawing remains at full opacity across all five regions. The existing keyboard/mouse/touch, coin-height, landing/reset, and mobile-layout checks also passed.
+
+Obstacle types, single/paired clusters, spacing, and coin counts, heights, and offsets are randomized each run. Patterns include coin-free challenges and high double-jump rewards. Spawn spacing leaves time to land between obstacle groups.
+
+Latest validation: Chromium checks for character-specific particles/poses, 500-point speed thresholds, 21 distinct minute palettes, gradual transitions, varied random patterns, jump physics, and mobile double-jump/restart. An accelerated 20-minute simulation (collisions bypassed for long-run inspection) completed with finite positions and bounded object counts. Live GitHub Pages deployment is separate from these local checks.
