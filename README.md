@@ -138,3 +138,9 @@ Latest update: Elf narrowed another 10% (81% of its original width). Random char
 Validated MP3 decoding and non-silent samples, advancing playback time, mute/unmute, recovery after blocked playback and navigation, and no browser errors in Chromium. Device mute and browser sound permissions still control whether playback can be heard.
 
 Latest update: sky coins bob at a steady, faster rate (6 radians/second, ±4 pixels), independent of running speed. Music replaced with the native audio player and bundled original MP3.
+
+## Three-minute song and mobile welcome
+
+The original soundtrack is now a full 180-second arrangement at 72 BPM, with an introduction, main theme, open-landscape section, brighter variation, quiet bridge, and homecoming. Notes wrap across the loop boundary rather than ending with silence. Browser tests verified exact decoded duration, varying section content, and native playback crossing the loop boundary.
+
+On devices with a touch-oriented primary pointer, the welcome screen displays “Turn your phone in landscape mode.” Verified on a mobile browser viewport, with the message hidden on desktop.
