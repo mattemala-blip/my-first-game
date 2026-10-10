@@ -13,7 +13,32 @@ let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
 let lastMilestone = 0, speech = '', speechTime = 0;
-const complaints = ['This is going too fast!', 'I’m getting tired!', 'So much running…', 'Are we done yet?', 'My boots need a holiday!', 'Who made this road so long?', 'Can we stop for a snack?', 'I should have brought a horse!', 'Even heroes need a break!', 'Is that another hill?'];
+const complaints = [
+  'This is going too fast!', 'Could we slow down a little?', 'My boots have no brakes!',
+  'Was that a tree or a blur?', 'I’m getting tired!', 'My legs have filed a complaint!',
+  'Even heroes need a nap!', 'I need a sitting-down quest!', 'So much running…',
+  'Who made this road so long?', 'I should have brought a horse!', 'Another mile? Really?',
+  'Are we done yet?', 'Is the finish line imaginary?', 'Are we nearly there… yet?',
+  'Can we stop for a snack?', 'My boots need a holiday!', 'I miss standing still!',
+  'This quest needs more benches!', 'Running was not in the contract!', 'Is that another hill?',
+  'I’m running out of heroic energy!', 'Can someone carry me?', 'Next time, we teleport!'
+];
+let previousComplaint = '';
+let effectVariant = 0;
+const variantCounts = { wizard: 50, warrior: 50, elf: 5, accountant: 30 };
+// Explicit combinations give exactly the requested number of distinct effects.
+const wizardPalettes = [
+  ['#fff3b0','#ffc76e'], ['#cbb4ff','#936eff'], ['#84ffe0','#35ceb8'],
+  ['#ffa6db','#ec64ae'], ['#9edcff','#579cff'], ['#ffbd99','#ff805b'],
+  ['#ddff9c','#9acf52'], ['#ffffff','#c0d4ee'], ['#ffdf71','#e9ac35'], ['#d5afff','#ff9cc9']
+];
+function chooseVariant(hero) { return Math.floor(Math.random() * variantCounts[hero]); }
+function chooseComplaint() {
+  const choices = complaints.filter(line => line !== previousComplaint);
+  previousComplaint = choices[Math.floor(Math.random() * choices.length)];
+  return previousComplaint;
+}
+
 let elapsed = 0, distance = 0, gold = 0, score = 0, nextSpawn = 1.5;
 let obstacles = [], coins = [], particles = [];
 let previousTime = 0;
@@ -42,13 +67,19 @@ function jump() {
   jumps++;
   player.velocity = jumps === 2 ? -620 : -650;
   const magic = jumps === 2;
-  if (magic) jumpEffect = 0.6;
-  const effectColors = { wizard: ['#fff3b0', '#b99aff', '#7ef3c1'], elf: ['#a9d875', '#66b985', '#e0f2ab'], warrior: ['#e6f2ff', '#ffdc7c', '#a7b9d0'], accountant: ['#f5efde', '#89bbdf', '#ffdc7c'] };
-  const count = magic ? (character === 'wizard' ? 24 : character === 'accountant' ? 5 : 0) : 0;
+  if (!magic) return;
+  jumpEffect = 0.6;
+  effectVariant = chooseVariant(character);
+  const count = character === 'wizard' ? 24 : character === 'accountant' ? 3 + effectVariant % 5 : 0;
   for (let i = 0; i < count; i++) {
-    particles.push({ x: player.x + 17, y: magic ? player.y + 30 : ground,
-      vx: (Math.random() - 0.5) * 240, vy: character === 'accountant' ? -160 - Math.random() * 180 : (Math.random() - 0.5) * 180,
-      life: character === 'accountant' ? 1.1 : 0.7, color: magic ? effectColors[character][i % 3] : '#a9ffe0', magic, effect: character });
+    const paper = character === 'accountant';
+    particles.push({ x: player.x + 20, y: player.y + 20,
+      vx: paper ? (Math.floor(effectVariant / 5) - 2.5) * 40 + (Math.random() - 0.5) * 80 : (Math.random() - 0.5) * 240,
+      vy: paper ? -180 - Math.random() * 160 : (Math.random() - 0.5) * 180,
+      life: paper ? 1.2 : 0.7, color: wizardPalettes[Math.floor(effectVariant / 5) % 10][i % 2],
+      magic: true, effect: character, shape: effectVariant % 5,
+      size: paper ? 0.8 + (effectVariant % 3) * 0.2 : 1,
+      document: Math.floor(effectVariant / 5), rotation: Math.random() * Math.PI });
   }
 }
 function endGame() {
@@ -95,6 +126,8 @@ function spawnPattern(speed) {
   for (let i = 0; i < coinCount; i++) {
     coins.push({ x: coinStart + i * 36, y: ground - (high ? 222 + Math.random() * 12 : 94 + Math.sin(i * 0.9) * 25), width: 22, height: 22, high });
   }
+  // A 0.5% chance per obstacle group: roughly one blue coin per 200 groups.
+  if (Math.random() < 0.005) coins.push({ x: startX + 170, y: ground - 120, width: 22, height: 22, blue: true });
   // Time-based clearance still allows landing at higher speeds; include cluster width.
   nextSpawn = 1.2 + Math.random() * 1.25 + count * 58 / speed;
 }
@@ -120,9 +153,9 @@ function update(dt) {
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
     if (overlaps(player, coin)) {
-      gold++;
+      gold += coin.blue ? 20 : 1;
       goldLabel.textContent = gold;
-      for (let i = 0; i < 10; i++) particles.push({ x: coin.x, y: coin.y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 160, life: 0.6, color: '#ffda70' });
+      for (let i = 0; i < 10; i++) particles.push({ x: coin.x, y: coin.y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 160, life: 0.6, color: coin.blue ? '#76dfff' : '#ffda70' });
       return false;
     }
     return coin.x > -30;
@@ -134,8 +167,7 @@ function update(dt) {
   const milestone = Math.floor(score / 10000);
   if (milestone > lastMilestone) {
     lastMilestone = milestone;
-    const cycle = Math.floor((milestone - 1) / complaints.length);
-    speech = complaints[(milestone - 1) % complaints.length] + (cycle ? ` (Still running: ${milestone * 10000}!)` : '');
+    speech = chooseComplaint();
     speechTime = 4;
     document.querySelector('#announcement').textContent = speech;
   }
@@ -148,17 +180,24 @@ function draw() {
   for (let i = 0; i < 25; i++) {
     const x = i * 47 - distance % 47;
     rect(x, ground + 28 + i % 3 * 16, 16, 4, '#394c51');
-    circle(x + 10, ground - 5, 3, i % 2 ? '#df9bff' : '#ffcb7b');
+
   }
-  for (const coin of coins) { if (coin.high) { circle(coin.x + 11, coin.y + 11, 17, '#b99aff55'); } circle(coin.x + 11, coin.y + 11, 12, '#ffcf65'); circle(coin.x + 11, coin.y + 11, 8, '#c98732'); rect(coin.x + 9, coin.y + 5, 4, 12, '#ffe4a0'); }
+  drawGrass();
+  for (const coin of coins) {
+    if (coin.blue) { ctx.save();ctx.shadowColor='#58caff';ctx.shadowBlur=18;circle(coin.x+11,coin.y+11,14,'#78ddff');ctx.restore(); }
+    else if (coin.high) circle(coin.x+11,coin.y+11,17,'#b99aff55');
+    circle(coin.x+11,coin.y+11,12,coin.blue?'#78ddff':'#ffcf65');
+    circle(coin.x+11,coin.y+11,8,coin.blue?'#297ac5':'#c98732');
+    if(coin.blue){ctx.font='bold 9px system-ui';ctx.fillStyle='#e6fbff';ctx.fillText('20',coin.x+5,coin.y+14);}
+    else rect(coin.x+9,coin.y+5,4,12,'#ffe4a0');
+  }
   for (const o of obstacles) drawObstacle(o);
   drawCharacter(player.x, player.y, character);
   drawSpeech();
   for (const p of particles) {
     ctx.globalAlpha = Math.min(1, p.life * 3);
-    if (p.magic && p.effect === 'wizard') { rect(p.x - 5, p.y - 1, 10, 2, p.color); rect(p.x - 1, p.y - 5, 2, 10, p.color); }
-    else if (p.magic && p.effect === 'elf') { ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(p.x, p.y, 5, 2, p.life * 8, 0, Math.PI * 2); ctx.fill(); }
-    else if (p.magic && p.effect === 'accountant') { ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.life*7);rect(-10,-13,20,26,'#fff9e9');polygon([[4,-13],[10,-7],[4,-7]],'#b6c8d6');for(let line=0;line<4;line++)rect(-6,-5+line*4,line===3?7:12,1,'#657c98');ctx.restore(); }
+    if (p.magic && p.effect === 'wizard') drawSparkle(p);
+    else if (p.magic && p.effect === 'accountant') drawPaper(p);
     else rect(p.x, p.y, p.magic ? 7 : 4, 2, p.color);
   }
   ctx.globalAlpha = 1;
@@ -303,7 +342,12 @@ function drawCharacter(x, y, hero) {
   const motion = Math.sin((0.6 - jumpEffect) / 0.6 * Math.PI);
   circle(x + 18, ground + 3, 18, '#182c3655');
   ctx.save();
-  if (hero === 'elf' && pose) {ctx.translate(x+22,y+27);ctx.rotate((1-jumpEffect/0.6)*Math.PI*2);ctx.translate(-x-22,-y-27);}
+  if (hero === 'elf' && pose) {
+    const progress=1-jumpEffect/0.6;ctx.translate(x+22,y+27);
+    const turns=[1,-1,2,-2,1];ctx.rotate(progress*Math.PI*2*turns[effectVariant]);
+    if(effectVariant===4)ctx.scale(Math.max(0.2,Math.abs(Math.cos(progress*Math.PI*2))),1);
+    ctx.translate(-x-22,-y-27);
+  }
   const outfits = { wizard: '#8459ce', elf: '#52966a', warrior: '#a7b9d0', accountant: '#50607d' };
   rect(x + 4, y + 28, 28, 22, outfits[hero]);
   rect(x + 8, y + 45 - bob, 9, 9, '#322c58');rect(x + 23, y + 45 - bob, 9, 9, '#322c58');
@@ -321,11 +365,18 @@ function drawCharacter(x, y, hero) {
     rect(x + 29, y + 28, 29, 2, '#f7e6bd');
   } else if (hero === 'warrior') {
     rect(x + 5, y + 6, 31, 12, '#cedae8'); rect(x + 8, y + 17, 6, 12, '#8798b2'); rect(x + 20, y - 3, 7, 10, '#e5809d');
+    if (pose) {
+      ctx.strokeStyle='#a7b9d0';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x+30,y+32);ctx.lineTo(x+41+motion*(12+Math.floor(effectVariant/10)*5),y+43);ctx.stroke();
+    }
     ctx.save();
-    if (pose) { ctx.translate(x+41,y+40);ctx.rotate(-1.8*motion-0.4);ctx.translate(-x-41,-y-40); }
+    if (pose) {
+      const angle=effectVariant%10, style=Math.floor(effectVariant/10);
+      ctx.translate(x+41+motion*(12+style*5),y+40);
+      ctx.rotate((0.75+angle*0.13)*motion);ctx.translate(-x-41,-y-40);
+    }
     rect(x + 38, y + 9, 6, 31, '#e6f2ff'); rect(x + 32, y + 37, 18, 4, '#ffdc7c'); rect(x + 39, y + 41, 4, 10, '#a37459');
     ctx.restore();
-    ctx.save();ctx.translate(x+3+(pose?motion*7:0),y+37-(pose?motion*14:0));ctx.scale(pose?1-motion*0.25:1,1);circle(0,0,13,'#7c8fa9');circle(0,0,8,'#ebc872');ctx.restore();
+    ctx.save();const shieldStyle=Math.floor(effectVariant/10),shieldAngle=effectVariant%10;ctx.translate(x+3+(pose?motion*(5+shieldStyle*4):0),y+37-(pose?motion*(6+shieldAngle*2):0));ctx.rotate(pose?motion*(shieldStyle-2)*0.3:0);ctx.scale(pose?1-motion*(0.1+shieldStyle*0.08):1,1);circle(0,0,13,'#7c8fa9');circle(0,0,8,'#ebc872');ctx.restore();
   } else {
     rect(x + 7, y + 7, 28, 9, '#5b3f35'); rect(x + 17, y + 28, 8, 19, '#f4f0e5'); rect(x + 20, y + 31, 3, 14, '#ef8a9e');
     // Two visible pupils inside two lenses.
@@ -361,4 +412,31 @@ function drawObstacle(o) {
   else if(kind==='gargoyle'){polygon([[x+7,y+24],[x-8,y+7],[x+5,y+9],[x+15,y],[x+25,y+9],[x+38,y+7],[x+24,y+26],[x+28,ground],[x+2,ground]],'#8790a8');rect(x+6,y+14,5,4,'#e7a1bd');rect(x+20,y+14,5,4,'#e7a1bd');}
   else if(kind==='cauldron'){circle(x+15,y+29,18,'#555473');rect(x-3,y+14,36,6,'#8993ac');rect(x+3,y+14,24,3,'#90e4b5');circle(x+10,y+7,4,'#90e4b5');circle(x+24,y+2,3,'#90e4b5');rect(x+3,y+40,5,8,'#555473');rect(x+23,y+40,5,8,'#555473');}
   else {for(let i=0;i<3;i++){polygon([[x+i*10,ground],[x+i*10+4,y+3],[x+i*10+10,ground]],'#637b69');polygon([[x+i*10+4,y+20],[x+i*10-5,y+12],[x+i*10+4,y+30]],'#90a178');}}
+}
+
+function drawSparkle(p) {
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.life*4);ctx.fillStyle=p.color;ctx.strokeStyle=p.color;ctx.lineWidth=2;
+  if(p.shape===0){rect(-6,-1,12,2,p.color);rect(-1,-6,2,12,p.color);}
+  else if(p.shape===1)polygon([[0,-7],[4,0],[0,7],[-4,0]],p.color);
+  else if(p.shape===2){ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.stroke();}
+  else if(p.shape===3){const points=[];for(let i=0;i<10;i++){const a=i*Math.PI/5,r=i%2?3:7;points.push([Math.sin(a)*r,Math.cos(a)*r]);}polygon(points,p.color);}
+  else polygon([[0,-6],[6,5],[-6,5]],p.color);
+  ctx.restore();
+}
+function drawPaper(p) {
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rotation+p.life*4);ctx.scale(p.size,p.size);
+  rect(-10,-13,20,26,'#fff9e9');polygon([[4,-13],[10,-7],[4,-7]],'#b6c8d6');
+  ctx.fillStyle='#657c98';ctx.font='bold 5px system-ui';
+  const headings=['BUDGET','REPORT','GDP','LOANS','DATA','PLAN'];ctx.fillText(headings[p.document],-8,-5);
+  if(p.document%3===0){for(let i=0;i<3;i++)rect(-6+i*5,8-i*3,3,3+i*3,'#657c98');}
+  else if(p.document%3===1){for(let i=0;i<3;i++)rect(-6,1+i*4,12-i*2,1,'#657c98');}
+  else {ctx.strokeStyle='#657c98';ctx.lineWidth=0.7;ctx.strokeRect(-6,0,12,9);rect(-6,4,12,1,'#657c98');rect(-1,0,1,9,'#657c98');}
+  ctx.restore();
+}
+function drawGrass() {
+  const offset=distance,first=Math.floor(offset/16)-1;
+  for(let i=first;i<first+63;i++){
+    const x=i*16-offset,height=3+sceneryNoise(i,61)*9,lean=sceneryNoise(i,62)*7-3;
+    polygon([[x-2,ground+1],[x+lean,ground-height],[x+2,ground+1]],i%2?'#578f72':'#72aa83');
+  }
 }

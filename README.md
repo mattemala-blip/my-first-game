@@ -94,3 +94,13 @@ Dense, solid evergreen silhouettes frame occasional distant landmarks. Rivers, b
 Ten randomly selected fantasy obstacles: slimes, crystals, spikes, cursed mushrooms, skulls, stumps, treasure chests, gargoyles, cauldrons, and thorns. Every 10,000 points, a four-second speech bubble shows a different running complaint, also announced for screen readers. Restart resets the milestone counter.
 
 Validated all obstacle drawing paths, milestone messages and threshold stability, upward paper movement, particle-free Elf spin, mobile jump/restart, and another accelerated 20-minute run in Chromium.
+
+## Random effects and rare treasure
+
+Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 50 forward sword/shield combinations (10 slash angles × 5 movement styles), Elf has 5 flip styles, and World Banker has 30 paper-throw combinations (5 paper counts × 6 document/direction styles, with varied sizes). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
+
+Milestone dialogue randomly picks from 24 complaints and avoids immediately repeating the previous line, including across restarts. Grass blades replace the colorful ground dots. The title credit reads “A game by Matteo Malacarne.”
+
+A glowing blue coin has a 0.5% chance to appear per obstacle group and awards 20 gold (1,000 score points). This is random, with no guaranteed interval.
+
+Validated all 135 effect variants in Chromium, distinct Wizard/paper combinations, random milestone selection, rare-coin spawn branches and reward, credit, mobile controls/layout/restart, and browser-error-free drawing.
