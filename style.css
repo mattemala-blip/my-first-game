@@ -55,3 +55,14 @@ header .credit { font-size: 12px; color: #b8a9cc; margin: 0 0 12px; }
   }
 }
 @media (max-width: 600px) and (pointer: coarse) { canvas { min-height: 480px; } }
+/* Swap the start control and orientation message on touch devices. */
+@media (pointer: coarse) {
+  .card { display: flex; flex-direction: column; align-items: center; }
+  .card .icon { order: 0; }
+  .card h2 { order: 1; }
+  .card #start { order: 2; margin: 12px 0; }
+  .card #message { order: 3; }
+  .card .characters { order: 4; }
+  .card .mobile-orientation { order: 5; }
+  .card small { order: 6; }
+}
