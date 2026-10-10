@@ -192,3 +192,7 @@ Double jumps have quiet original sound effects in `assets/sounds`, played by `so
 Foreground trees are rooted in a solid terrain bank instead of appearing above unrelated distant scenery. White dragons with blue fire have a 1% chance per 1,000-pixel sky slot; white wolves with red eyes have a 2% chance per 1,000-pixel scenery slot. These use independent slots from the regular variants. Warrior sound is a quiet metallic sword “schiing.”
 
 Speed stops increasing at 150,000 points (2,670 pixels/second). Temporary invincibility is currently ON: set `const invincible = false` in `game.js` to restore obstacle collisions. Coin collection and scoring continue normally. Validated speed cap, obstacle-contact immunity, grounded terrain, white-creature/fire rendering and rarity sampling in Chromium.
+
+Latest scenery refinements: river crossings reserve clear space from buildings, towers, trees, and small props; bridge height aligns with the river. Colored field strips removed and replaced by eight tiny random fantasy props: treasure chest, rune stone, campfire, sword in stone, mushrooms, lantern shrine, banner, and cairn. Props anchor to the foreground bank. Palette stages now last 80 seconds rather than 90, maintaining smooth transitions and a 40-minute cycle. Warrior audio now has a sharper metallic attack and ringing overtones. Temporary invincibility remains ON.
+
+Validated 200 scenery samples, all eight prop designs, river clearance, and retention of invincibility and the speed cap in Chromium.
