@@ -130,3 +130,9 @@ Current coin timing: first blue coin scheduled randomly at 2–3 minutes; later 
 Validated timing in an accelerated 21-minute Chromium simulation, exact paper scaling, rendering for all four characters, and collectibility of all treasure layouts at three speeds.
 
 Latest update: Elf narrowed another 10% (81% of its original width). Random character comments now appear every five minutes of active gameplay, beginning at five minutes, instead of score thresholds. Restart resets the timer; time in a hidden browser tab does not count.
+
+## Original fantasy lo-fi music
+
+`music.js` synthesizes an original 72 BPM looping fantasy lo-fi track using the browser's Web Audio API: spacious pentatonic melody, warm chords, bass, and soft percussion. No audio files, external services, or copyrighted soundtrack samples are needed. Music starts with Start quest or Space. The Music on/off button toggles audio and remembers the preference locally. Hidden tabs suspend music; returning resumes it when enabled.
+
+Validated audio-context startup on user gesture, mute/suspend, reload preference, unmute, and repeated jumping without extra audio contexts in Chromium. Sound synthesis works locally; audio taste and volume can be adjusted in `music.js`.
