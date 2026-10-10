@@ -4,7 +4,7 @@ A colorful, endless fantasy runner made with plain HTML, CSS, and JavaScript. No
 
 ## Play
 
-Open `index.html` in your browser and choose **Wizard**, **Elf archer**, **Warrior**, or **Accountant**, then click **Start quest** (or press Space). All characters have the same abilities.
+Open `index.html` in your browser and choose **Wizard**, **Elf**, **Warrior**, or **World Banker**, then click **Start quest** (or press Space). All characters have the same abilities.
 
 - Press **Space**, click the game, or tap it on your phone to jump. Press/click/tap again in the air for a magic double jump. Two quick clicks work; you get two jumps before you must land.
 - Glowing high coins can only be collected with a double jump. Time your second jump shortly after the first to rise higher.
@@ -74,3 +74,11 @@ Change the starting speed (`270`), maximum speed (`470`), jump velocity (`-650`)
 Tested in headless Chromium: starting, Space/click/tap jumps, coin collection and score, obstacle collision, game-over screen, restart, high-score persistence, natural obstacle spawning, and mobile layout. JavaScript syntax also passed `node --check game.js`.
 
 The character and landscape update was also tested in Chromium: four character selections; mouse, keyboard, and touch double jumps; a third jump prevented; landing and restart reset jumps; high coins missed by a single jump and collected with a double jump; smooth region transitions; mobile character-menu layout.
+
+## Character effects and living scenery
+
+The four names are **Wizard**, **Elf**, **Warrior**, and **World Banker**. The Wizard double-jumps with sparkles; the Elf kicks a leg with a leaf trail; the Warrior swings a sword with metallic streaks; the World Banker raises an arm with fluttering papers. All retain identical jump physics. The World Banker has two visible eyes behind glasses.
+
+Scenery is drawn with fully opaque shapes: slowly changing mountains and rolling countryside, rivers with bridges, evergreen trees and orchards, castles, manors, cottages, fences, windmills, fields, sheep, deer, clouds, and flapping birds. Objects scroll into view instead of fading through one another.
+
+Validated the new labels and each character's jump pose/effect in Chromium, and checked that scenery drawing remains at full opacity across all five regions. The existing keyboard/mouse/touch, coin-height, landing/reset, and mobile-layout checks also passed.

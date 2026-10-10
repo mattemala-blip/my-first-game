@@ -11,6 +11,7 @@ const player = { x: 155, y: ground - 54, width: 34, height: 54, velocity: 0 };
 let state = 'ready';
 let character = 'wizard';
 let jumps = 0;
+let jumpEffect = 0;
 let elapsed = 0, distance = 0, gold = 0, score = 0, nextSpawn = 1.5;
 let obstacles = [], coins = [], particles = [];
 let previousTime = 0;
@@ -25,6 +26,7 @@ function startGame() {
   player.y = ground - player.height;
   player.velocity = 0;
   jumps = 0;
+  jumpEffect = 0;
   character = document.querySelector('input[name=hero]:checked').value;
   scoreLabel.textContent = goldLabel.textContent = '0';
   state = 'playing';
@@ -37,10 +39,12 @@ function jump() {
   jumps++;
   player.velocity = jumps === 2 ? -620 : -650;
   const magic = jumps === 2;
+  if (magic) jumpEffect = 0.6;
+  const effectColors = { wizard: ['#fff3b0', '#b99aff', '#7ef3c1'], elf: ['#a9d875', '#66b985', '#e0f2ab'], warrior: ['#e6f2ff', '#ffdc7c', '#a7b9d0'], accountant: ['#f5efde', '#89bbdf', '#ffdc7c'] };
   for (let i = 0; i < (magic ? 24 : 8); i++) {
     particles.push({ x: player.x + 17, y: magic ? player.y + 30 : ground,
       vx: (Math.random() - 0.5) * (magic ? 300 : 100), vy: (Math.random() - 0.5) * 180,
-      life: magic ? 0.7 : 0.4, color: magic ? ['#fff3b0', '#b99aff', '#7ef3c1'][i % 3] : '#a9ffe0', magic });
+      life: magic ? 0.7 : 0.4, color: magic ? effectColors[character][i % 3] : '#a9ffe0', magic, effect: character });
   }
 }
 function endGame() {
@@ -70,6 +74,7 @@ function overlaps(a, b) {
 }
 function update(dt) {
   elapsed += dt;
+  jumpEffect = Math.max(0, jumpEffect - dt);
   const speed = Math.min(470, 270 + elapsed * 4);
   distance += speed * dt;
   player.velocity += 1700 * dt;
@@ -128,8 +133,10 @@ function draw() {
   drawCharacter(player.x, player.y, character);
   for (const p of particles) {
     ctx.globalAlpha = Math.min(1, p.life * 3);
-    if (p.magic) { rect(p.x - 5, p.y - 1, 10, 2, p.color); rect(p.x - 1, p.y - 5, 2, 10, p.color); }
-    else rect(p.x, p.y, 4, 4, p.color);
+    if (p.magic && p.effect === 'wizard') { rect(p.x - 5, p.y - 1, 10, 2, p.color); rect(p.x - 1, p.y - 5, 2, 10, p.color); }
+    else if (p.magic && p.effect === 'elf') { ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(p.x, p.y, 5, 2, p.life * 8, 0, Math.PI * 2); ctx.fill(); }
+    else if (p.magic && p.effect === 'accountant') { rect(p.x, p.y, 7, 5, p.color); rect(p.x + 1, p.y + 2, 4, 1, '#50607d'); }
+    else rect(p.x, p.y, p.magic ? 7 : 4, 2, p.color);
   }
   ctx.globalAlpha = 1;
 }
@@ -163,58 +170,98 @@ function landscapeAt(travel) {
   return result;
 }
 function rgb(color) { return `rgb(${color.map(Math.round).join(',')})`; }
+// Solid objects enter from offscreen. Geography and colors morph slowly, never fade.
+function polygon(points, color) {
+  ctx.fillStyle = color; ctx.beginPath(); points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); ctx.fill();
+}
+function sceneryItems(spacing, speed, paint) {
+  const offset = distance * speed;
+  const first = Math.floor(offset / spacing) - 2;
+  for (let i = first; i < first + Math.ceil(960 / spacing) + 5; i++) paint(i * spacing - offset, i);
+}
 function drawLandscape() {
   const land = landscapeAt(distance);
+  ctx.globalAlpha = 1;
   const sky = ctx.createLinearGradient(0, 0, 0, 480);
   sky.addColorStop(0, rgb(land.sky)); sky.addColorStop(1, rgb(land.horizon));
   ctx.fillStyle = sky; ctx.fillRect(0, 0, 960, 480);
   circle(760, 102, 38, '#fff1b8'); circle(775, 90, 35, rgb(land.sky));
-  ctx.globalAlpha = 0.6;
-  for (let i = 0; i < 28; i++) circle((i * 137 + 31) % 960, (i * 43) % 200 + 20, i % 3 === 0 ? 2 : 1, '#ede1ff');
-  ctx.globalAlpha = 0.3 + land.peaks * 0.7;
-  const mountainOffset = distance * 0.055;
-  for (let i = Math.floor(mountainOffset / 280) - 1; i < Math.floor(mountainOffset / 280) + 5; i++) {
-    const x = i * 280 - mountainOffset;
-    const height = 110 + (Math.sin(i * 7.3) + 1) * 55;
-    ctx.fillStyle = rgb(land.mountain);
-    ctx.beginPath(); ctx.moveTo(x - 60, ground); ctx.lineTo(x + 140, ground - height); ctx.lineTo(x + 340, ground); ctx.fill();
-    ctx.fillStyle = '#e4e5ef'; ctx.beginPath(); ctx.moveTo(x + 140, ground - height); ctx.lineTo(x + 100, ground - height + 42); ctx.lineTo(x + 150, ground - height + 31); ctx.lineTo(x + 180, ground - height + 42); ctx.fill();
-  }
-  ctx.globalAlpha = land.castle;
-  const castleOffset = distance * 0.085;
-  for (let i = Math.floor(castleOffset / 1100); i <= Math.floor(castleOffset / 1100) + 1; i++) {
-    const x = i * 1100 + 520 - castleOffset;
-    const stone = rgb(land.mountain.map(v => v + 25));
-    rect(x, 255, 150, 133, stone);
-    for (let t = 0; t < 3; t++) {
-      const towerX = x - 22 + t * 84;
-      rect(towerX, 220, 40, 168, stone);
-      for (let tooth = 0; tooth < 3; tooth++) rect(towerX + tooth * 15, 210, 10, 14, stone);
-      rect(towerX + 16, 238, 7, 16, '#ffe6a1');
-      rect(towerX + 18, 187, 3, 25, stone);
-      ctx.fillStyle = '#df91ba'; ctx.beginPath(); ctx.moveTo(towerX + 21, 187); ctx.lineTo(towerX + 45, 194); ctx.lineTo(towerX + 21, 202); ctx.fill();
+  sceneryItems(360, 0.03, (x, i) => {
+    const y = 90 + Math.sin(i * 2) * 25;
+    circle(x, y, 18, '#dfe5ed'); circle(x + 22, y - 8, 24, '#dfe5ed'); circle(x + 48, y, 18, '#dfe5ed');
+  });
+  sceneryItems(280, 0.055, (x, i) => {
+    const height = 65 + land.peaks * 125 + (Math.sin(i * 7.3) + 1) * 35;
+    polygon([[x - 60, 320], [x + 140, 320 - height], [x + 340, 320]], rgb(land.mountain));
+    polygon([[x + 140, 320 - height], [x + 110, 352 - height], [x + 142, 342 - height], [x + 170, 352 - height]], '#e4e5ef');
+  });
+  // Rolling countryside is opaque and masks the mountain bases.
+  const grass = rgb(land.trees.map((v,i) => v + [25,45,0][i]));
+  const hills = [[0, 388], [0, 304]];
+  for (let x = 0; x <= 980; x += 20) hills.push([x, 295 + Math.sin((x + distance * 0.09) / 180) * 20]);
+  hills.push([980,388]); polygon(hills, grass);
+  // A broad river winds through the fields, with solid banks and ripples.
+  sceneryItems(1700, 0.12, (x, i) => {
+    polygon([[x, 306], [x + 28, 306], [x + 140, 335], [x + 75, 362], [x + 230, 388], [x + 110, 388], [x + 10, 364], [x + 75, 338]], '#82cbd3');
+    for (let k=0;k<4;k++) rect(x + 35 + k * 16, 336 + k * 11, 27, 2, '#d4f3e5');
+    // Wooden bridge.
+    rect(x + 28, 353, 103, 8, '#af8058'); rect(x + 28, 346, 103, 3, '#dfb480');
+    for(let k=0;k<5;k++) rect(x + 30 + k*24, 346, 3, 17, '#805e48');
+  });
+  sceneryItems(430, 0.17, (x, i) => {
+    const type = ((i % 7) + 7) % 7;
+    const y = 335 + Math.sin(i * 2.4) * 10;
+    if (type === 0 || type === 4) {
+      // Castles and country manors alternate along the road.
+      const castle = type === 0;
+      rect(x, y - 64, 115, 64, castle ? '#a8b4c4' : '#ecd2a4');
+      if (castle) {
+        for(let t=0;t<2;t++) { const tx=x-12+t*110; rect(tx,y-95,30,95,'#92a2b7'); for(let k=0;k<3;k++)rect(tx+k*12,y-104,7,12,'#92a2b7'); rect(tx+12,y-81,7,15,'#ffe0a0'); }
+      } else polygon([[x-10,y-64],[x+55,y-102],[x+125,y-64]], '#865e79');
+      for(let k=0;k<4;k++)rect(x+12+k*26,y-49,9,14,'#ffe5ab');
+      rect(x+48,y-27,20,27,'#635776');
+    } else if (type === 2 || type === 5) {
+      // Villages, cottages, orchards and fences.
+      for(let h=0;h<2;h++) { const hx=x+h*60; rect(hx,y-32,48,32,'#f0d7af'); polygon([[hx-6,y-32],[hx+24,y-58],[hx+54,y-32]],h?'#966f91':'#b27468'); rect(hx+7,y-23,10,10,'#83bed2');rect(hx+29,y-21,10,21,'#765948'); }
+      rect(x-10,y+10,145,3,'#ecd1a1'); for(let k=0;k<7;k++)rect(x-10+k*24,y+3,3,17,'#ecd1a1');
+    } else if(type===3) {
+      // Windmill with slowly turning sails.
+      polygon([[x,y],[x+12,y-65],[x+40,y-65],[x+52,y]],'#e5d9ba');
+      ctx.save();ctx.translate(x+26,y-57);ctx.rotate(elapsed*0.35);for(let k=0;k<4;k++){ctx.rotate(Math.PI/2);rect(0,-3,44,6,'#796552');rect(14,-9,30,6,'#faf0d6');}ctx.restore();
+    } else {
+      for(let k=0;k<5;k++) rect(x+k*20,y-3,16,5, k%2?'#e1bd70':'#b3c97a');
     }
-    rect(x + 60, 335, 26, 53, '#32425c');
-  }
-  for (let layer = 0; layer < 3; layer++) {
-    ctx.globalAlpha = land.forest * (0.6 + layer * 0.2);
-    const spacing = 160 - layer * 25, offset = distance * (0.12 + layer * 0.15);
-    for (let i = Math.floor(offset / spacing) - 1; i < Math.floor(offset / spacing) + 10; i++) {
-      const x = i * spacing - offset, top = 125 + layer * 48 + (Math.sin(i * 3.7) + 1) * 18;
-      const color = rgb(land.trees.map(v => v + (2 - layer) * 8));
-      rect(x + 32, top + 40, 12, ground - top, color);
-      ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x + 38, top); ctx.lineTo(x - 14, top + 145); ctx.lineTo(x + 90, top + 145); ctx.closePath(); ctx.fill();
-    }
-  }
-  ctx.globalAlpha = 1;
+  });
+  sceneryItems(130, 0.24, (x, i) => {
+    const variation = (Math.sin(i * 4.7)+1)/2;
+    const size = 22 + land.forest*32 + variation*18;
+    const base = 359 + Math.sin(i)*12;
+    rect(x+19,base-size,8,size,'#86644b');
+    if(i%3===0) polygon([[x+23,base-size*2],[x-10,base-15],[x+56,base-15]],rgb(land.trees));
+    else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
+  });
+  sceneryItems(510,0.3,(x,i)=>{
+    const sheep=i%2===0, y=372;
+    if(sheep){circle(x+12,y-10,12,'#f4eddd');circle(x+26,y-10,6,'#655b61');}
+    else {rect(x,y-19,27,14,'#c89a72');rect(x+23,y-28,8,20,'#c89a72');polygon([[x+24,y-27],[x+20,y-36],[x+27,y-32]],'#8b6955');}
+    rect(x+4,y-5,3,8,'#655b61');rect(x+20,y-5,3,8,'#655b61');
+  });
+  sceneryItems(300,0.07,(x,i)=>{
+    const y=135+Math.sin(i*3)*32;
+    ctx.strokeStyle='#35465a';ctx.lineWidth=2;ctx.beginPath();
+    const flap=Math.sin(elapsed*4+i)*5;
+    ctx.moveTo(x-8,y-flap);ctx.lineTo(x,y);ctx.lineTo(x+8,y-flap);ctx.stroke();
+  });
 }
 function drawCharacter(x, y, hero) {
   const bob = state === 'playing' && player.velocity === 0 ? Math.sin(elapsed * 20) * 2 : 0;
   y += bob;
+  const pose = jumpEffect > 0;
+  const motion = Math.sin((0.6 - jumpEffect) / 0.6 * Math.PI);
   circle(x + 18, ground + 3, 18, '#182c3655');
   const outfits = { wizard: '#8459ce', elf: '#52966a', warrior: '#a7b9d0', accountant: '#50607d' };
   rect(x + 4, y + 28, 28, 22, outfits[hero]);
-  rect(x + 8, y + 45 - bob, 9, 9, '#322c58'); rect(x + 23, y + 45 - bob, 9, 9, '#322c58');
+  rect(x + 8, y + 45 - bob, 9, 9, '#322c58'); if (hero === 'elf' && pose) { ctx.save();ctx.translate(x+26,y+43);ctx.rotate(-0.7-0.6*motion);rect(-4,0,9,18,'#322c58');ctx.restore(); } else rect(x + 23, y + 45 - bob, 9, 9, '#322c58');
   rect(x + 10, y + 14, 22, 17, '#ffd3a3'); rect(x + 26, y + 18, 4, 5, '#273548');
   if (hero === 'wizard') {
     ctx.fillStyle = '#aa83ee'; ctx.beginPath(); ctx.moveTo(x - 5, y + 15); ctx.lineTo(x + 14, y - 14); ctx.lineTo(x + 34, y + 15); ctx.closePath(); ctx.fill();
@@ -229,10 +276,17 @@ function drawCharacter(x, y, hero) {
     rect(x + 29, y + 28, 29, 2, '#f7e6bd');
   } else if (hero === 'warrior') {
     rect(x + 5, y + 6, 31, 12, '#cedae8'); rect(x + 8, y + 17, 6, 12, '#8798b2'); rect(x + 20, y - 3, 7, 10, '#e5809d');
+    ctx.save();
+    if (pose) { ctx.translate(x+41,y+40);ctx.rotate(-1.8*motion-0.4);ctx.translate(-x-41,-y-40);ctx.strokeStyle='#fff2b6';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x+41,y+40,37,-2.2,-0.5);ctx.stroke(); }
     rect(x + 38, y + 9, 6, 31, '#e6f2ff'); rect(x + 32, y + 37, 18, 4, '#ffdc7c'); rect(x + 39, y + 41, 4, 10, '#a37459');
+    ctx.restore();
     circle(x + 3, y + 37, 13, '#7c8fa9'); circle(x + 3, y + 37, 8, '#ebc872');
   } else {
     rect(x + 7, y + 7, 28, 9, '#5b3f35'); rect(x + 17, y + 28, 8, 19, '#f4f0e5'); rect(x + 20, y + 31, 3, 14, '#ef8a9e');
+    // Two visible pupils inside two lenses.
+    rect(x+14,y+19,5,5,'#ffffff');rect(x+26,y+19,5,5,'#ffffff');
+    rect(x+16,y+20,2,3,'#192338');rect(x+28,y+20,2,3,'#192338');
+    if (pose) { rect(x+31,y+6,7,25,'#50607d');rect(x+30,y,9,9,'#ffd3a3'); }
     ctx.strokeStyle = '#192338'; ctx.lineWidth = 2;
     ctx.strokeRect(x + 12, y + 18, 8, 7); ctx.strokeRect(x + 24, y + 18, 8, 7); rect(x + 20, y + 20, 4, 2, '#192338');
     rect(x + 35, y + 33, 19, 17, '#ba875c'); rect(x + 40, y + 29, 9, 5, '#e3b98c'); rect(x + 43, y + 39, 3, 5, '#ffdc7c');
