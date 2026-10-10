@@ -66,3 +66,9 @@ header .credit { font-size: 12px; color: #b8a9cc; margin: 0 0 12px; }
   .card .mobile-orientation { order: 5; }
   .card small { order: 6; }
 }
+
+.pause-screen { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; background: #11172988; pointer-events: none; }
+.pause-screen strong { font-size: clamp(30px, 6vw, 56px); letter-spacing: 6px; text-shadow: 0 3px 12px #000; }
+.pause-button { position: absolute; bottom: 12px; left: 12px; z-index: 4; padding: 10px 14px; background: #242b40; color: #e5daf6; border: 1px solid #88789c; box-shadow: none; font-size: 12px; }
+.pause-button:hover { background: #39425b; }
+.pause-screen[hidden], .pause-button[hidden] { display: none; }

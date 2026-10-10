@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rune Runner — One More Quest</title>
-  <link rel="stylesheet" href="style.css?v=forest-37">
-  <script src="game.js?v=forest-37" defer></script>
-  <script src="music.js?v=forest-37" defer></script>
-  <script src="sounds.js?v=forest-37" defer></script>
+  <link rel="stylesheet" href="style.css?v=forest-38">
+  <script src="game.js?v=forest-38" defer></script>
+  <script src="music.js?v=forest-38" defer></script>
+  <script src="sounds.js?v=forest-38" defer></script>
 </head>
 <body>
   <main>
@@ -16,6 +16,8 @@
       <div class="hud"><div>QUEST SCORE<strong id="score">0</strong></div><div>GOLD<strong id="gold">0</strong></div><div>BEST<strong id="best">0</strong></div></div>
       <canvas id="world" width="960" height="480" aria-label="Your chosen hero traveling through a changing magical land. Jump over crystals and slimes." tabindex="0"></canvas>
       <div class="overlay" id="overlay"><div class="card"><div class="icon">✦</div><h2 id="title">Your quest awaits</h2><p class="mobile-orientation">Turn your phone in landscape mode</p><p id="message">Leap over obstacles and collect gold.<br>Double jump to reach higher.</p><fieldset class="characters"><legend>Choose your adventurer</legend><label><input type="radio" name="hero" value="wizard" checked><span>🧙 Wizard</span></label><label><input type="radio" name="hero" value="elf"><span>🏹 Elf</span></label><label><input type="radio" name="hero" value="warrior"><span>⚔ Warrior</span></label><label><input type="radio" name="hero" value="accountant"><span>👓 World Banker</span></label></fieldset><button id="start">Start quest</button><small>SPACE / CLICK / TAP · TWICE TO DOUBLE JUMP</small></div></div>
+      <div id="pause-screen" class="pause-screen" hidden><strong>PAUSED</strong></div>
+      <button id="pause" class="pause-button" type="button" aria-pressed="false" aria-controls="world" hidden>Ⅱ Pause</button>
     </section>
     <footer><span class="coin-legend"><svg class="coin-symbol" viewBox="0 0 32 32" role="img" aria-label="Coin"><circle cx="16" cy="16" r="14" fill="#ffcf65"/><circle cx="16" cy="16" r="9" fill="#c98732"/><path d="M16 10v12" stroke="#ffe4a0" stroke-width="4"/></svg> +50 points · <svg class="coin-symbol" viewBox="0 0 32 32" role="img" aria-label="Blue coin"><circle cx="16" cy="16" r="14" fill="#78ddff"/><circle cx="16" cy="16" r="9" fill="#297ac5"/><path d="M16 10v12" stroke="#d8f6ff" stroke-width="4"/></svg> +1000 points · <svg class="coin-symbol" viewBox="0 0 32 32" role="img" aria-label="Purple coin"><circle cx="16" cy="16" r="14" fill="#d9a3ff"/><circle cx="16" cy="16" r="9" fill="#8a45bb"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="11" font-weight="bold">★</text></svg> +50000 points</span><span>Tip: click twice for double jump</span></footer>
     <button id="music-toggle" class="music-toggle" type="button" aria-pressed="true">♫ Music on</button>
