@@ -13,6 +13,8 @@ let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
 let dragonTimes = [];
+let scenerySeed = 0, sceneryStart = 0, paletteStart = 0;
+let regionOrder = Array.from({length:30}, (_,i)=>i);
 let lastCommentInterval = 0, speech = '', speechTime = 0;
 const complaints = [
   'This is going too fast!', 'Could we slow down a little?', 'My boots have no brakes!',
@@ -54,6 +56,14 @@ bestLabel.textContent = best;
 
 function startGame() {
   elapsed = distance = gold = score = 0;
+  scenerySeed = (scenerySeed + 1 + Math.floor(Math.random()*1000000)) % 1000000000;
+  sceneryStart = Math.random()*300000;
+  paletteStart = Math.random()*90;
+  regionOrder = Array.from({length:30},(_,i)=>i);
+  for(let i=regionOrder.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [regionOrder[i],regionOrder[j]]=[regionOrder[j],regionOrder[i]];
+  }
   nextSpawn = 1.5;
   nextBlueTime = 120 + Math.random() * 60;
   purpleTime = purpleDelay(); purpleSpawned = false; bonusScore = 0;
@@ -247,7 +257,7 @@ requestAnimationFrame(frame);
 // Thirty distinct 90-second chapters: no palette cycle within 20 minutes.
 // Scenery hashes world positions rather than repeating a short list of props.
 function sceneryNoise(index, salt = 0) {
-  const value = Math.sin(index * 127.1 + salt * 311.7) * 43758.5453;
+  const value = Math.sin(index * 127.1 + salt * 311.7 + scenerySeed * 0.731) * 43758.5453;
   return value - Math.floor(value);
 }
 const regions = Array.from({ length: 30 }, (_, i) => {
@@ -259,11 +269,11 @@ const regions = Array.from({ length: 30 }, (_, i) => {
     forest: 0.3 + sceneryNoise(i,13)*0.7, peaks: sceneryNoise(i,14), castle: sceneryNoise(i,15) };
 });
 function landscapeAt(seconds) {
-  const progress = seconds / 90;
+  const progress = (seconds + paletteStart) / 90;
   const index = Math.floor(progress) % regions.length;
   const fraction = progress % 1;
   const blend = fraction * fraction * (3 - 2 * fraction);
-  const a = regions[index], b = regions[(index + 1) % regions.length];
+  const a = regions[regionOrder[index]], b = regions[regionOrder[(index + 1) % regions.length]];
   const result = {};
   for (const key of Object.keys(a)) result[key] = Array.isArray(a[key])
     ? a[key].map((value, i) => value + (b[key][i] - value) * blend)
@@ -276,7 +286,7 @@ function polygon(points, color) {
   ctx.fillStyle = color; ctx.beginPath(); points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); ctx.fill();
 }
 function sceneryItems(spacing, speed, paint) {
-  const offset = distance * speed;
+  const offset = (distance + sceneryStart) * speed;
   const first = Math.floor(offset / spacing) - 2;
   for (let i = first; i < first + Math.ceil(960 / spacing) + 5; i++) paint(i * spacing - offset, i);
 }
@@ -300,7 +310,7 @@ function drawLandscape() {
   // Rolling countryside is opaque and masks the mountain bases.
   const grass = rgb(land.trees.map((v,i) => v + [0,12,0][i]));
   const hills = [[0, 388], [0, 304]];
-  for (let x = 0; x <= 980; x += 20) hills.push([x, 295 + Math.sin((x + distance * 0.09) / 180) * 20]);
+  for (let x = 0; x <= 980; x += 20) hills.push([x, 295 + Math.sin((x + (distance + sceneryStart) * 0.09) / 180) * 20]);
   hills.push([980,388]); polygon(hills, grass);
   sceneryItems(110, 0.13, (x,i)=>{
     const base = 324, height = 75 + sceneryNoise(i,40)*80;
@@ -527,28 +537,24 @@ function complaintCountAt(seconds) {
 }
 // Twenty distinct species, with silhouettes suited to a mythical forest.
 const animals = [
- ['Wolf','canine','#7c8795'],['Dire wolf','canine','#586575'],['Fox','canine','#a67862'],['Arctic fox','canine','#bbc5ca'],
- ['Stag','deer','#a08a74'],['Doe','deer','#b49a80'],['Elk','deer','#8b7967'],['Reindeer','deer','#9e9989'],
- ['Unicorn','horse','#c5c9d3'],['Forest pony','horse','#817581'],['Wild horse','horse','#9b8475'],
+ ['Wolf','canine','#7c8795'],['Fox','canine','#a67862'],
+ ['Stag','deer','#a08a74'],['Doe','deer','#b49a80'],['Elk','deer','#8b7967'],
  ['Bear','bear','#77706b'],['Boar','bear','#686e72'],['Badger','bear','#96999b'],
- ['Hare','rabbit','#a49b94'],['Moon rabbit','rabbit','#b7c1cc'],['Lynx','cat','#a3967e'],['Panther','cat','#485363'],
- ['Griffin','winged','#a6a28f'],['Hippogriff','winged','#8e99a7']
+ ['Hare','rabbit','#a49b94'],['Lynx','cat','#a3967e']
 ];
 function drawAnimal(x,y,index) {
  const [name,shape,color]=animals[index];
  ctx.save();ctx.translate(x,y);ctx.scale(0.85,0.85);
  const bulk=shape==='bear'?1.25:1;
  ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(12,-14,16*bulk,8*bulk,0,0,Math.PI*2);ctx.fill();
- const neck=shape==='deer'||shape==='horse';
+ const neck=shape==='deer';
  rect(24,-(neck?33:23),7,neck?24:14,color);circle(30,neck?-33:-22,6,color);
  for(const leg of [1,10,20,27])rect(leg,-9,3,10,color);
  circle(33,neck?-34:-23,1,'#293242');
  if(shape==='canine'||shape==='cat'){polygon([[25,-25],[24,-34],[30,-28]],color);polygon([[4,-16],[-13,-26],[-5,-15],[0,-10]],color);}
  if(shape==='deer'&&name!=='Doe'){ctx.strokeStyle=color;ctx.lineWidth=2;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(28,-36);ctx.lineTo(28+side*9,-49);ctx.lineTo(28+side*14,-46);ctx.moveTo(28+side*6,-45);ctx.lineTo(28+side*6,-52);ctx.stroke();}}
- if(shape==='horse'){polygon([[24,-34],[18,-36],[20,-16],[24,-12]],'#545a69');if(name==='Unicorn')polygon([[32,-38],[37,-53],[35,-37]],'#d9d0b3');}
  if(shape==='bear'){circle(27,-28,3,color);if(name==='Boar')polygon([[33,-20],[40,-24],[38,-17]],'#c9c4ac');if(name==='Badger')rect(29,-27,3,11,'#d0d0bd');}
  if(shape==='rabbit'){rect(24,-42,4,18,color);rect(31,-39,4,15,color);circle(-2,-13,5,color);}
- if(shape==='winged'){polygon([[9,-16],[-2,-44],[12,-35],[21,-46],[25,-17]],color);polygon([[34,-23],[43,-19],[34,-17]],'#b9ac8b');}
  if(name==='Lynx')for(let k=0;k<4;k++)circle(k*7,-16,1.5,'#635c59');
  ctx.restore();
 }

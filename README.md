@@ -168,3 +168,9 @@ Random complaints appear at 3, 6, 8, 10, 12 minutes and every two minutes therea
 The forest has 20 creature designs: wolf, dire wolf, fox, arctic fox, stag, doe, elk, reindeer, unicorn, forest pony, wild horse, bear, boar, badger, hare, moon rabbit, lynx, panther, griffin, and hippogriff. Castles randomly vary across 20 combinations of architecture and details. Three muted wizard tower designs have a 2.5% chance per widely spaced scenery slot. Each run schedules exactly three distant dragon passes in separate windows (3–6, 11–15, and 21–26 minutes); shorter runs may see fewer. Scenery remains decorative.
 
 Validated complaint thresholds, bobbing for all coin categories, all creature/castle/tower drawing paths, dragon schedule reset, and collectibility of treasure challenges at three speeds in Chromium.
+
+## A different forest every run
+
+Wildlife now has ten regular forest species: wolf, fox, stag, doe, elk, bear, boar, badger, hare, and lynx. Every restart picks a new scenery seed and world starting offset, shuffles the 30 landscape chapters, and chooses a different starting point within the first chapter. Background variety changes independently of score and gameplay distance; transitions remain gradual.
+
+Validated ten animal drawing paths, six distinct restart scenery seeds/starts/orders, smooth chapter boundaries, and score/distance resets in Chromium.
