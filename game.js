@@ -6,6 +6,8 @@ const goldLabel = document.querySelector('#gold');
 const bestLabel = document.querySelector('#best');
 const overlay = document.querySelector('#overlay');
 const startButton = document.querySelector('#start');
+// Keep the displayed hero name in sync when loading updated game code.
+document.querySelector('input[value=accountant] + span').textContent = '👓 Matteo';
 const pauseButton = document.querySelector('#pause');
 const pauseScreen = document.querySelector('#pause-screen');
 const ground = 388;
