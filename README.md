@@ -200,3 +200,5 @@ Validated 200 scenery samples, all eight prop designs, river clearance, and rete
 Background rollback: restored the layout before river-clearance changes, eliminating the moving exclusion zones that made trees pop in/out. Kept eight tiny fantasy decorations instead of field strips, and palette stages now last 75 seconds. Metallic sword sound and temporary invincibility are retained. Validated restored scenery and all eight props in Chromium.
 
 River-and-bridge crossings now use 8,400-background-pixel spacing instead of 2,800, reducing frequency by a factor of three. Mountains select one of ten subtle, stable shape profiles randomly per scenery slot. The bottom-left Pause/Resume button freezes the entire game and displays PAUSED while music keeps playing; paused time does not count toward gameplay events. Verified frozen game state, continuing music, Space safety, resume, and all ten mountain profiles in Chromium.
+
+Mountain shapes restored to their original setting. Temporary invincibility removed: hitting an obstacle ends the run again. Rarer rivers, pause/resume, and 75-second palette stages remain.

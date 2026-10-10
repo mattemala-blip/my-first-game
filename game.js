@@ -11,8 +11,6 @@ const pauseScreen = document.querySelector('#pause-screen');
 const ground = 388;
 const player = { x: 155, y: ground - 54, width: 34, height: 54, velocity: 0 };
 let state = 'ready';
-// Temporary testing switch: set false to restore obstacle collisions.
-const invincible = true;
 let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
@@ -207,7 +205,7 @@ function update(dt) {
   for (const obstacle of obstacles) {
     obstacle.x -= speed * dt;
     // A slightly forgiving hitbox makes close jumps feel fair.
-    if (!invincible && overlaps({ x: player.x + 7, y: player.y + 8, width: 20, height: 44 }, obstacle)) { endGame(); return; }
+    if (overlaps({ x: player.x + 7, y: player.y + 8, width: 20, height: 44 }, obstacle)) { endGame(); return; }
   }
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
@@ -312,12 +310,6 @@ function sceneryItems(spacing, speed, paint) {
   const first = Math.floor(offset / spacing) - 2;
   for (let i = first; i < first + Math.ceil(960 / spacing) + 5; i++) paint(i * spacing - offset, i);
 }
-// Small, stable differences in peak position, height, base width and snow caps.
-const mountainProfiles = [
-  [0,1,0,0], [-9,.97,-6,2], [8,1.03,5,-2], [-5,1.02,8,3],
-  [11,.98,-4,-3], [-12,1.04,4,1], [5,.96,7,-1], [-7,1.01,-8,4],
-  [3,1.05,-3,-4], [10,.99,3,2]
-];
 function drawLandscape() {
   const land = landscapeAt(elapsed);
   ctx.globalAlpha = 1;
@@ -331,11 +323,9 @@ function drawLandscape() {
     circle(x, y, 18, rgb(land.mountain.map(v=>v+25))); circle(x + 22, y - 8, 24, rgb(land.mountain.map(v=>v+25))); circle(x + 48, y, 18, rgb(land.mountain.map(v=>v+25)));
   });
   sceneryItems(280, 0.055, (x, i) => {
-    const [shift, scale, width, snow] = mountainProfiles[Math.floor(sceneryNoise(i, 121) * 10)];
-    const height = (65 + land.peaks * 125 + (Math.sin(i * 7.3) + 1) * 35) * scale;
-    const peakX = x + 140 + shift, peakY = 320 - height;
-    polygon([[x - 60 - width, 320], [peakX, peakY], [x + 340 + width, 320]], rgb(land.mountain));
-    polygon([[peakX, peakY], [peakX - 30, peakY + 32 + snow], [peakX + 2, peakY + 22], [peakX + 30, peakY + 32 - snow]], '#e4e5ef');
+    const height = 65 + land.peaks * 125 + (Math.sin(i * 7.3) + 1) * 35;
+    polygon([[x - 60, 320], [x + 140, 320 - height], [x + 340, 320]], rgb(land.mountain));
+    polygon([[x + 140, 320 - height], [x + 110, 352 - height], [x + 142, 342 - height], [x + 170, 352 - height]], '#e4e5ef');
   });
   // Rolling countryside is opaque and masks the mountain bases.
   const grass = rgb(land.trees.map((v,i) => v + [0,12,0][i]));
