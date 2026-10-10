@@ -4,7 +4,7 @@ A colorful, endless fantasy runner made with plain HTML, CSS, and JavaScript. No
 
 ## Play
 
-Open `index.html` in your browser and choose **Wizard**, **Elf**, **Warrior**, or **World Banker**, then click **Start quest** (or press Space). All characters have the same abilities.
+Open `index.html` in your browser and choose **Wizard**, **Elf**, **Warrior**, or **Matteo**, then click **Start quest** (or press Space). All characters have the same abilities.
 
 - Press **Space**, click the game, or tap it on your phone to jump. Press/click/tap again in the air for a magic double jump. Two quick clicks work; you get two jumps before you must land.
 - Glowing high coins can only be collected with a double jump. Time your second jump shortly after the first to rise higher.
@@ -77,7 +77,7 @@ The character and landscape update was also tested in Chromium: four character s
 
 ## Character effects and living scenery
 
-The four names are **Wizard**, **Elf**, **Warrior**, and **World Banker**. The Wizard double-jumps with sparkles; the Elf spins around without particles; the Warrior moves sword and shield without particles; the World Banker throws papers upward. All retain identical jump physics. The World Banker has two visible eyes behind glasses.
+The four names are **Wizard**, **Elf**, **Warrior**, and **Matteo**. The Wizard double-jumps with sparkles; the Elf spins around without particles; the Warrior moves sword and shield without particles; the Matteo throws papers upward. All retain identical jump physics. The Matteo has two visible eyes behind glasses.
 
 Scenery is drawn with fully opaque shapes: slowly changing mountains and rolling countryside, rivers with bridges, evergreen trees and orchards, castles, manors, cottages, fences, windmills, fields, sheep, deer, clouds, and flapping birds. Objects scroll into view instead of fading through one another.
 
@@ -89,7 +89,7 @@ Latest validation: Chromium checks for character-specific particles/poses, 500-p
 
 ## Gloomy forest update
 
-Dense, solid evergreen silhouettes frame occasional distant landmarks. Rivers, buildings, animals and birds are spaced farther apart; the 30 slowly blending regions now form a 45-minute palette cycle. The World Banker throws five larger paper sheets with folded corners and written lines.
+Dense, solid evergreen silhouettes frame occasional distant landmarks. Rivers, buildings, animals and birds are spaced farther apart; the 30 slowly blending regions now form a 45-minute palette cycle. The Matteo throws five larger paper sheets with folded corners and written lines.
 
 Ten randomly selected fantasy obstacles: slimes, crystals, spikes, cursed mushrooms, skulls, stumps, treasure chests, gargoyles, cauldrons, and thorns. Every 10,000 points, a four-second speech bubble shows a different running complaint, also announced for screen readers. Restart resets the milestone counter.
 
@@ -97,7 +97,7 @@ Validated all obstacle drawing paths, milestone messages and threshold stability
 
 ## Random effects and rare treasure
 
-Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 8 moves (7 sword hacks and 1 forward flip), Elf has 5 flip styles, and World Banker has 150 paper-throw combinations (25 document sets × 6 throw styles, with varied counts, sizes, and directions). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
+Every double jump randomly selects an effect: Wizard has 50 combinations (10 palettes × 5 sparkle shapes), Warrior has 8 moves (7 sword hacks and 1 forward flip), Elf has 5 flip styles, and Matteo has 150 paper-throw combinations (25 document sets × 6 throw styles, with varied counts, sizes, and directions). Papers feature budget/report/GDP/loan/data/plan headings and lines, tables, or charts. Random choices can repeat; these are variations, not a fixed sequence.
 
 Milestone dialogue randomly picks from 24 complaints and avoids immediately repeating the previous line, including across restarts. Grass blades replace the colorful ground dots. The title credit reads “A game by Matteo Malacarne.”
 
@@ -115,15 +115,15 @@ Validated purple timing boundaries, one spawn over a simulated 25-minute run, th
 
 ## Treasure challenges
 
-Warrior now has exactly seven directional sword hacks and one forward flip. Wizard retains 50 random variations; World Banker retains 150. Blue coins have a plain center stripe, without “20,” including in the legend.
+Warrior now has exactly seven directional sword hacks and one forward flip. Wizard retains 50 random variations; Matteo retains 150. Blue coins have a plain center stripe, without “20,” including in the legend.
 
 Each blue or purple spawn randomly chooses one of four obstacle layouts. Blue coins demand a timed double jump above or just after obstacles; purple coins sit higher among tighter obstacle groups. Layout offsets scale with speed and leave reaction time, while normal obstacle spawning pauses around their approach. Blue recurrence and once-per-run purple scheduling remain in place.
 
-Browser validation found successful timed double jumps for all 24 combinations of coin type, layout, and three representative speeds (0/30,000/70,000 points), and rendered all 208 Wizard/Warrior/World Banker variants without browser errors.
+Browser validation found successful timed double jumps for all 24 combinations of coin type, layout, and three representative speeds (0/30,000/70,000 points), and rendered all 208 Wizard/Warrior/Matteo variants without browser errors.
 
 ## Discreet scenery and updated timing
 
-Background portals and crystal groves have been removed. Remaining landmarks are 25% smaller and use muted colors. Character sprites are scaled around their feet to similar standing heights while retaining the same shared gameplay hitbox. World Banker sheets are 15% smaller than the previous version.
+Background portals and crystal groves have been removed. Remaining landmarks are 25% smaller and use muted colors. Character sprites are scaled around their feet to similar standing heights while retaining the same shared gameplay hitbox. Matteo sheets are 15% smaller than the previous version.
 
 Current coin timing: first blue coin scheduled randomly at 2–3 minutes; later blue coins every 1–3 minutes. Purple coin scheduled once per run at 8–20 minutes. These clocks use active gameplay time, reset on restart, and retain randomized treasure obstacle challenges.
 
@@ -185,7 +185,7 @@ Validated exact dragon timing bounds, no early first pass, twelve repeated passe
 
 Latest scenery settings: bats and wolves each have a 15% chance per 1,500-background-pixel slot. Dragons now use scenery placement instead of a timer: 5% per 3,000-pixel slot, retaining animated fire breath. Birds retain 30% per 1,000-pixel slot. Random scenery seeds vary placement each run.
 
-Double jumps have quiet original sound effects in `assets/sounds`, played by `sounds.js`: sword swoosh for Warrior hacks, sparkle chimes for Wizard, spin whoosh for Elf, and paper rustle for World Banker. The Warrior flip has no sword sound. Wizard staff tilts slightly during the effect. Chromium verified all four sound triggers and scenery/animation drawing without browser errors.
+Double jumps have quiet original sound effects in `assets/sounds`, played by `sounds.js`: sword swoosh for Warrior hacks, sparkle chimes for Wizard, spin whoosh for Elf, and paper rustle for Matteo. The Warrior flip has no sword sound. Wizard staff tilts slightly during the effect. Chromium verified all four sound triggers and scenery/animation drawing without browser errors.
 
 ## White creatures and temporary testing mode
 
