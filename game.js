@@ -12,7 +12,16 @@ let state = 'ready';
 let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
-let dragonTimes = [];
+let nextDragonTime = Infinity, lastDragonTime = -Infinity, dragonCount = 0;
+function firstDragonDelay() { return 180 + Math.random()*300; }
+function dragonInterval() { return 300 + Math.random()*180; }
+function updateDragonSchedule() {
+  while (elapsed >= nextDragonTime) {
+    lastDragonTime = nextDragonTime;
+    dragonCount++;
+    nextDragonTime += dragonInterval();
+  }
+}
 let scenerySeed = 0, sceneryStart = 0, paletteStart = 0;
 let regionOrder = Array.from({length:30}, (_,i)=>i);
 let lastCommentInterval = 0, speech = '', speechTime = 0;
@@ -72,7 +81,7 @@ function startGame() {
   player.velocity = 0;
   jumps = 0;
   jumpEffect = 0;
-  dragonTimes = [180 + Math.random()*180, 660 + Math.random()*240, 1260 + Math.random()*300];
+  nextDragonTime = firstDragonDelay(); lastDragonTime = -Infinity; dragonCount = 0;
   lastCommentInterval = 0; speech = ''; speechTime = 0;
   character = document.querySelector('input[name=hero]:checked').value;
   scoreLabel.textContent = goldLabel.textContent = '0';
@@ -159,6 +168,7 @@ function spawnPattern(speed) {
 }
 function update(dt) {
   elapsed += dt;
+  updateDragonSchedule();
   if (elapsed >= nextBlueTime) {
     spawnTreasureChallenge('blue');
     nextBlueTime = elapsed + blueInterval();
@@ -361,6 +371,16 @@ function drawLandscape() {
       circle(bx,by,3,color);
     }
   });
+  sceneryItems(1800,0.08,(x,i)=>{
+    if(sceneryNoise(i,84)>0.06)return;
+    const y=330,color='#222f3a';
+    ctx.save();ctx.translate(x,y);ctx.scale(0.65,0.65);
+    polygon([[-18,-10],[-12,-21],[12,-24],[25,-33],[33,-30],[42,-24],[32,-18],[21,-17],[17,-4],[-9,-4]],color);
+    polygon([[27,-31],[25,-42],[34,-32]],color);
+    polygon([[-13,-17],[-34,-30],[-27,-14],[-15,-7]],color);
+    for(const leg of [-10,3,16,25])rect(leg,-9,3,15,color);
+    circle(34,-28,1,'#77878b');ctx.restore();
+  });
   sceneryItems(85, 0.22, (x, i) => {
     const variation = (Math.sin(i * 4.7)+1)/2;
     const size = 42 + land.forest*45 + variation*24;
@@ -369,7 +389,8 @@ function drawLandscape() {
     if(sceneryNoise(i,22)<0.72) polygon([[x+23,base-size*2],[x-10,base-15],[x+56,base-15]],rgb(land.trees));
     else { circle(x+23,base-size-16,size*0.6,rgb(land.trees));circle(x+5,base-size-7,size*0.45,rgb(land.trees));circle(x+39,base-size-8,size*0.5,rgb(land.trees)); if(i%4===0) {circle(x+12,base-size-14,3,'#f1aa7a');circle(x+32,base-size-21,3,'#f1aa7a');} }
   });
-  sceneryItems(600,0.06,(x,i)=>{
+  sceneryItems(1000,0.06,(x,i)=>{
+    if(sceneryNoise(i,83)>0.3)return;
     const y=135+Math.sin(i*3)*32;
     ctx.strokeStyle='#35465a';ctx.lineWidth=2;ctx.beginPath();
     const flap=Math.sin(elapsed*4+i)*5;
@@ -572,11 +593,9 @@ function drawWizardTower(x,y,type) {
  ctx.restore();
 }
 function drawDragons() {
- for(let i=0;i<dragonTimes.length;i++){
-  const age=elapsed-dragonTimes[i];if(age<0||age>24)continue;
-  const x=1010-age*46,y=95+i*18+Math.sin(age*0.35)*7;
+  const age=elapsed-lastDragonTime;if(age<0||age>24)return;
+  const x=975-age*44,y=95+(dragonCount%3)*18+Math.sin(age*0.35)*7;
   const flap=Math.sin(age*2)*13,color='#46556b';
   polygon([[x-22,y],[x+17,y-3],[x+27,y-9],[x+33,y-4],[x+22,y+4],[x-18,y+6],[x-38,y+2]],color);
   polygon([[x-5,y],[x-26,y-24-flap],[x+2,y-13],[x+22,y-24-flap],[x+12,y+2]],color);
- }
 }

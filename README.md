@@ -176,3 +176,9 @@ Wildlife now has ten regular forest species: wolf, fox, stag, doe, elk, bear, bo
 Validated ten animal drawing paths, six distinct restart scenery seeds/starts/orders, smooth chapter boundaries, and score/distance resets in Chromium.
 
 Latest scenery update: ground animals removed. Distant birds and three per-run dragon windows remain. Rare pairs of bats appear in widely spaced sky slots with a 6% chance per slot, substantially less frequently than birds. Checked 150 scenery samples in Chromium without browser errors.
+
+Latest wildlife timing: dragons recur indefinitely. The first is scheduled at 3–8 minutes, then each following pass at a random 5–8 minute interval. Only the last pass and next timestamp are retained, so long runs do not accumulate dragon records. Restart resets this schedule.
+
+Birds now use wider-spaced slots and a 30% appearance chance. Bats use even wider slots with a 6% chance; lone black wolves in the distance use the same slot spacing and chance as bats, with independent selection. All are decorative.
+
+Validated exact dragon timing bounds, no early first pass, twelve repeated passes with valid gaps, restart reset, and 150 scenery samples without browser errors in Chromium.
