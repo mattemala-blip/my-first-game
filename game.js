@@ -12,7 +12,7 @@ let state = 'ready';
 let character = 'wizard';
 let jumps = 0;
 let jumpEffect = 0;
-let lastMilestone = 0, speech = '', speechTime = 0;
+let lastCommentInterval = 0, speech = '', speechTime = 0;
 const complaints = [
   'This is going too fast!', 'Could we slow down a little?', 'My boots have no brakes!',
   'Was that a tree or a blur?', 'I’m getting tired!', 'My legs have filed a complaint!',
@@ -61,7 +61,7 @@ function startGame() {
   player.velocity = 0;
   jumps = 0;
   jumpEffect = 0;
-  lastMilestone = 0; speech = ''; speechTime = 0;
+  lastCommentInterval = 0; speech = ''; speechTime = 0;
   character = document.querySelector('input[name=hero]:checked').value;
   scoreLabel.textContent = goldLabel.textContent = '0';
   state = 'playing';
@@ -183,9 +183,9 @@ function update(dt) {
   particles = particles.filter(p => { p.x += p.vx * dt; p.y += p.vy * dt; if (p.effect === 'accountant') p.vy += 420 * dt; p.life -= dt; return p.life > 0; });
   score = Math.floor(distance / 12) + gold * 50 + bonusScore;
   scoreLabel.textContent = score;
-  const milestone = Math.floor(score / 10000);
-  if (milestone > lastMilestone) {
-    lastMilestone = milestone;
+  const commentInterval = Math.floor(elapsed / 300);
+  if (commentInterval > lastCommentInterval) {
+    lastCommentInterval = commentInterval;
     speech = chooseComplaint();
     speechTime = 4;
     document.querySelector('#announcement').textContent = speech;
@@ -359,7 +359,7 @@ function drawCharacter(x, y, hero) {
   ctx.save();
   const scale = {wizard:0.8,elf:1.15,warrior:0.95,accountant:1.15}[hero];
   ctx.translate(x+18,y+54);
-  ctx.scale(scale * (hero === 'elf' ? 0.9 : hero === 'warrior' ? 1.05 : 1), scale * (hero === 'wizard' || hero === 'warrior' ? 1.1 : 1));
+  ctx.scale(scale * (hero === 'elf' ? 0.81 : hero === 'warrior' ? 1.05 : 1), scale * (hero === 'wizard' || hero === 'warrior' ? 1.1 : 1));
   ctx.translate(-x-18,-y-54);
   if (hero === 'elf' && pose) {
     const progress=1-jumpEffect/0.6;ctx.translate(x+22,y+27);

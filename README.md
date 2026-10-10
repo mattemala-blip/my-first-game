@@ -128,3 +128,5 @@ Background portals and crystal groves have been removed. Remaining landmarks are
 Current coin timing: first blue coin scheduled randomly at 2–3 minutes; later blue coins every 1–3 minutes. Purple coin scheduled once per run at 8–20 minutes. These clocks use active gameplay time, reset on restart, and retain randomized treasure obstacle challenges.
 
 Validated timing in an accelerated 21-minute Chromium simulation, exact paper scaling, rendering for all four characters, and collectibility of all treasure layouts at three speeds.
+
+Latest update: Elf narrowed another 10% (81% of its original width). Random character comments now appear every five minutes of active gameplay, beginning at five minutes, instead of score thresholds. Restart resets the timer; time in a hidden browser tab does not count.
