@@ -182,3 +182,7 @@ Latest wildlife timing: dragons recur indefinitely. The first is scheduled at 3â
 Birds now use wider-spaced slots and a 30% appearance chance. Bats use even wider slots with a 6% chance; lone black wolves in the distance use the same slot spacing and chance as bats, with independent selection. All are decorative.
 
 Validated exact dragon timing bounds, no early first pass, twelve repeated passes with valid gaps, restart reset, and 150 scenery samples without browser errors in Chromium.
+
+Latest scenery settings: bats and wolves each have a 15% chance per 1,500-background-pixel slot. Dragons now use scenery placement instead of a timer: 5% per 3,000-pixel slot, retaining animated fire breath. Birds retain 30% per 1,000-pixel slot. Random scenery seeds vary placement each run.
+
+Double jumps have quiet original sound effects in `assets/sounds`, played by `sounds.js`: sword swoosh for Warrior hacks, sparkle chimes for Wizard, spin whoosh for Elf, and paper rustle for World Banker. The Warrior flip has no sword sound. Wizard staff tilts slightly during the effect. Chromium verified all four sound triggers and scenery/animation drawing without browser errors.
