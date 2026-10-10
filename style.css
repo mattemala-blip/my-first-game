@@ -36,3 +36,6 @@ footer { display: flex; justify-content: space-between; gap: 12px; padding: 20px
 @media (max-width: 600px) { canvas { min-height: 420px; } .card { padding: 10px; } .card p { margin: 8px 0 12px; } .icon { font-size: 24px; } small { letter-spacing: 1px; margin-top: 14px; } }
 
 header .credit { font-size: 12px; color: #b8a9cc; margin: 0 0 12px; }
+
+.coin-symbol { width: 22px; height: 22px; vertical-align: middle; margin-right: 3px; }
+.coin-legend { line-height: 2; }

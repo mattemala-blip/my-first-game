@@ -26,9 +26,11 @@ const complaints = [
 let previousComplaint = '';
 let effectVariant = 0;
 let nextBlueTime = 0;
+let purpleTime = 0, purpleSpawned = false, bonusScore = 0;
+function purpleDelay() { return 300 + Math.random() * 900; }
 const paperHeadings = ['BUDGET','REPORT','GDP','LOANS','DATA','PLAN','AUDIT','GRANTS','TRADE','CLIMATE','HEALTH','SCHOOLS','ROADS','WATER','ENERGY','GROWTH','JOBS','BONDS','TAX','FORECAST','POVERTY','FUNDS','RISKS','SAVINGS','PROJECT'];
 function blueInterval() { return 120 + Math.random() * 180; }
-const variantCounts = { wizard: 50, warrior: 30, elf: 5, accountant: 150 };
+const variantCounts = { wizard: 50, warrior: 8, elf: 5, accountant: 150 };
 // Explicit combinations give exactly the requested number of distinct effects.
 const wizardPalettes = [
   ['#fff3b0','#ffc76e'], ['#cbb4ff','#936eff'], ['#84ffe0','#35ceb8'],
@@ -53,6 +55,7 @@ function startGame() {
   elapsed = distance = gold = score = 0;
   nextSpawn = 1.5;
   nextBlueTime = blueInterval();
+  purpleTime = purpleDelay(); purpleSpawned = false; bonusScore = 0;
   obstacles = []; coins = []; particles = [];
   player.y = ground - player.height;
   player.velocity = 0;
@@ -141,6 +144,10 @@ function update(dt) {
     coins.push({ x: 930, y: ground - 120, width: 22, height: 22, blue: true });
     nextBlueTime = elapsed + blueInterval();
   }
+  if (!purpleSpawned && elapsed >= purpleTime) {
+    coins.push({ x: 930, y: ground - 120, width: 22, height: 22, purple: true });
+    purpleSpawned = true;
+  }
   jumpEffect = Math.max(0, jumpEffect - dt);
   speechTime = Math.max(0, speechTime - dt);
   const speed = speedForScore(score);
@@ -161,16 +168,17 @@ function update(dt) {
   coins = coins.filter(coin => {
     coin.x -= speed * dt;
     if (overlaps(player, coin)) {
-      gold += coin.blue ? 20 : 1;
+      if (coin.purple) bonusScore += 50000;
+      else gold += coin.blue ? 20 : 1;
       goldLabel.textContent = gold;
-      for (let i = 0; i < 10; i++) particles.push({ x: coin.x, y: coin.y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 160, life: 0.6, color: coin.blue ? '#76dfff' : '#ffda70' });
+      for (let i = 0; i < 10; i++) particles.push({ x: coin.x, y: coin.y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 160, life: 0.6, color: coin.purple ? '#d9a3ff' : coin.blue ? '#76dfff' : '#ffda70' });
       return false;
     }
     return coin.x > -30;
   });
   obstacles = obstacles.filter(obstacle => obstacle.x > -60);
   particles = particles.filter(p => { p.x += p.vx * dt; p.y += p.vy * dt; if (p.effect === 'accountant') p.vy += 420 * dt; p.life -= dt; return p.life > 0; });
-  score = Math.floor(distance / 12) + gold * 50;
+  score = Math.floor(distance / 12) + gold * 50 + bonusScore;
   scoreLabel.textContent = score;
   const milestone = Math.floor(score / 10000);
   if (milestone > lastMilestone) {
@@ -192,11 +200,12 @@ function draw() {
   }
   drawGrass();
   for (const coin of coins) {
-    if (coin.blue) { ctx.save();ctx.shadowColor='#58caff';ctx.shadowBlur=18;circle(coin.x+11,coin.y+11,14,'#78ddff');ctx.restore(); }
+    if (coin.blue || coin.purple) { ctx.save();ctx.shadowColor=coin.purple?'#bb69ff':'#58caff';ctx.shadowBlur=18;circle(coin.x+11,coin.y+11,14,coin.purple?'#d9a3ff':'#78ddff');ctx.restore(); }
     else if (coin.high) circle(coin.x+11,coin.y+11,17,'#b99aff55');
-    circle(coin.x+11,coin.y+11,12,coin.blue?'#78ddff':'#ffcf65');
-    circle(coin.x+11,coin.y+11,8,coin.blue?'#297ac5':'#c98732');
-    if(coin.blue){ctx.font='bold 9px system-ui';ctx.fillStyle='#e6fbff';ctx.fillText('20',coin.x+5,coin.y+14);}
+    circle(coin.x+11,coin.y+11,12,coin.purple?'#d9a3ff':coin.blue?'#78ddff':'#ffcf65');
+    circle(coin.x+11,coin.y+11,8,coin.purple?'#8a45bb':coin.blue?'#297ac5':'#c98732');
+    if(coin.purple){ctx.font='bold 8px system-ui';ctx.fillStyle='#fff0ff';ctx.fillText('★',coin.x+7,coin.y+14);}
+    else if(coin.blue){ctx.font='bold 9px system-ui';ctx.fillStyle='#e6fbff';ctx.fillText('20',coin.x+5,coin.y+14);}
     else rect(coin.x+9,coin.y+5,4,12,'#ffe4a0');
   }
   for (const o of obstacles) drawObstacle(o);
@@ -356,8 +365,8 @@ function drawCharacter(x, y, hero) {
     if(effectVariant===4)ctx.scale(Math.max(0.2,Math.abs(Math.cos(progress*Math.PI*2))),1);
     ctx.translate(-x-22,-y-27);
   }
-  if (hero === 'warrior' && pose && effectVariant >= 24) {
-    const progress=1-jumpEffect/0.6,flip=effectVariant-24;
+  if (hero === 'warrior' && pose && effectVariant >= 4) {
+    const progress=1-jumpEffect/0.6,flip=effectVariant-4;
     ctx.translate(x+22,y+27);ctx.rotate(progress*Math.PI*2*(flip%2?-1:1)*(1+Math.floor(flip/2)));ctx.translate(-x-22,-y-27);
   }
   const outfits = { wizard: '#8459ce', elf: '#52966a', warrior: '#a7b9d0', accountant: '#50607d' };
@@ -377,14 +386,14 @@ function drawCharacter(x, y, hero) {
     rect(x + 29, y + 28, 29, 2, '#f7e6bd');
   } else if (hero === 'warrior') {
     rect(x + 5, y + 6, 31, 12, '#cedae8'); rect(x + 8, y + 17, 6, 12, '#8798b2'); rect(x + 20, y - 3, 7, 10, '#e5809d');
-    // 24 slashes: 8 directions × 3 swing styles; 6 whole-body flips.
+    // Four directional slashes and four slash/flip combinations.
     const move = warriorMove(effectVariant, jumpEffect);
-    const armAngle = pose && effectVariant < 24 ? move.sword : 0;
+    const armAngle = pose ? move.sword : 0;
     const grip = warriorGrip(x, y, armAngle);
     ctx.strokeStyle='#a7b9d0';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x+30,y+32);ctx.lineTo(grip.x,grip.y);ctx.stroke();
     ctx.save();ctx.translate(x+30,y+32);ctx.rotate(armAngle);ctx.translate(11,8);
     rect(-3,-34,6,31,'#e6f2ff');rect(-9,-6,18,4,'#ffdc7c');rect(-2,-2,4,10,'#a37459');ctx.restore();
-    ctx.save();ctx.translate(x+8,y+30);ctx.rotate(pose && effectVariant<24?move.shield:0);ctx.translate(-5,7);
+    ctx.save();ctx.translate(x+8,y+30);ctx.rotate(pose?move.shield:0);ctx.translate(-5,7);
     circle(0,0,13,'#7c8fa9');circle(0,0,8,'#ebc872');ctx.restore();
   } else {
     rect(x + 7, y + 7, 28, 9, '#5b3f35'); rect(x + 17, y + 28, 8, 19, '#f4f0e5'); rect(x + 20, y + 31, 3, 14, '#ef8a9e');
@@ -452,10 +461,9 @@ function drawGrass() {
 
 function warriorMove(variant, remaining) {
   const progress = 1 - remaining / 0.6;
-  const direction = (variant % 8) * Math.PI / 4;
-  const style = Math.floor(variant / 8);
-  const swing = style === 0 ? Math.sin(progress * Math.PI) : style === 1 ? Math.sin(progress * Math.PI * 2) : Math.sin(progress * Math.PI) ** 2;
-  return { sword: (direction + 0.8) * swing, shield: (style - 1) * swing * 0.8 + Math.sin(direction) * swing * 0.4 };
+  const direction = [0.7, -0.8, 2.0, -2.1][variant % 4];
+  const swing = Math.sin(progress * Math.PI);
+  return { sword: direction * swing, shield: (variant % 4 - 1.5) * swing * 0.4 };
 }
 function warriorGrip(x, y, angle) {
   // The arm always has the same length; only its angle changes.
