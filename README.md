@@ -120,3 +120,11 @@ Warrior now has exactly seven directional sword hacks and one forward flip. Wiza
 Each blue or purple spawn randomly chooses one of four obstacle layouts. Blue coins demand a timed double jump above or just after obstacles; purple coins sit higher among tighter obstacle groups. Layout offsets scale with speed and leave reaction time, while normal obstacle spawning pauses around their approach. Blue recurrence and once-per-run purple scheduling remain in place.
 
 Browser validation found successful timed double jumps for all 24 combinations of coin type, layout, and three representative speeds (0/30,000/70,000 points), and rendered all 208 Wizard/Warrior/World Banker variants without browser errors.
+
+## Discreet scenery and updated timing
+
+Background portals and crystal groves have been removed. Remaining landmarks are 25% smaller and use muted colors. Character sprites are scaled around their feet to similar standing heights while retaining the same shared gameplay hitbox. World Banker sheets are 15% smaller than the previous version.
+
+Current coin timing: first blue coin scheduled randomly at 2–3 minutes; later blue coins every 1–3 minutes. Purple coin scheduled once per run at 8–20 minutes. These clocks use active gameplay time, reset on restart, and retain randomized treasure obstacle challenges.
+
+Validated timing in an accelerated 21-minute Chromium simulation, exact paper scaling, rendering for all four characters, and collectibility of all treasure layouts at three speeds.

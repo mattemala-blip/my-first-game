@@ -27,9 +27,9 @@ let previousComplaint = '';
 let effectVariant = 0;
 let nextBlueTime = 0;
 let purpleTime = 0, purpleSpawned = false, bonusScore = 0;
-function purpleDelay() { return 300 + Math.random() * 900; }
+function purpleDelay() { return 480 + Math.random() * 720; }
 const paperHeadings = ['BUDGET','REPORT','GDP','LOANS','DATA','PLAN','AUDIT','GRANTS','TRADE','CLIMATE','HEALTH','SCHOOLS','ROADS','WATER','ENERGY','GROWTH','JOBS','BONDS','TAX','FORECAST','POVERTY','FUNDS','RISKS','SAVINGS','PROJECT'];
-function blueInterval() { return 120 + Math.random() * 180; }
+function blueInterval() { return 60 + Math.random() * 120; }
 const variantCounts = { wizard: 50, warrior: 8, elf: 5, accountant: 150 };
 // Explicit combinations give exactly the requested number of distinct effects.
 const wizardPalettes = [
@@ -54,7 +54,7 @@ bestLabel.textContent = best;
 function startGame() {
   elapsed = distance = gold = score = 0;
   nextSpawn = 1.5;
-  nextBlueTime = blueInterval();
+  nextBlueTime = 120 + Math.random() * 60;
   purpleTime = purpleDelay(); purpleSpawned = false; bonusScore = 0;
   obstacles = []; coins = []; particles = [];
   player.y = ground - player.height;
@@ -87,7 +87,7 @@ function jump() {
       vy: paper ? -180 - Math.random() * 160 : (Math.random() - 0.5) * 180,
       life: paper ? 1.2 : 0.7, color: wizardPalettes[Math.floor(effectVariant / 5) % 10][i % 2],
       magic: true, effect: character, shape: effectVariant % 5,
-      size: paper ? 0.8 + (throwStyle % 3) * 0.2 : 1,
+      size: paper ? (0.8 + (throwStyle % 3) * 0.2) * 0.85 : 1,
       document: (documentSet + i) % paperHeadings.length, rotation: Math.random() * Math.PI });
   }
 }
@@ -297,42 +297,37 @@ function drawLandscape() {
   });
   // A broad river winds through the fields, with solid banks and ripples.
   sceneryItems(2800, 0.09, (x, i) => {
-    polygon([[x, 306], [x + 28, 306], [x + 140, 335], [x + 75, 362], [x + 230, 388], [x + 110, 388], [x + 10, 364], [x + 75, 338]], '#82cbd3');
-    for (let k=0;k<4;k++) rect(x + 35 + k * 16, 336 + k * 11, 27, 2, '#d4f3e5');
+    polygon([[x, 306], [x + 28, 306], [x + 140, 335], [x + 75, 362], [x + 230, 388], [x + 110, 388], [x + 10, 364], [x + 75, 338]], '#53868d');
+    for (let k=0;k<4;k++) rect(x + 35 + k * 16, 336 + k * 11, 27, 2, '#8caea7');
     // Wooden bridge.
     rect(x + 28, 353, 103, 8, '#af8058'); rect(x + 28, 346, 103, 3, '#dfb480');
     for(let k=0;k<5;k++) rect(x + 30 + k*24, 346, 3, 17, '#805e48');
   });
   sceneryItems(1100, 0.12, (x, i) => {
-    const type = Math.floor(sceneryNoise(i,21) * 9);
+    const type = Math.floor(sceneryNoise(i,21) * 7);
     const y = 335 + Math.sin(i * 2.4) * 10;
+    ctx.save();ctx.translate(x,y);ctx.scale(0.75,0.75);ctx.translate(-x,-y);
     if (type === 0 || type === 4) {
       // Castles and country manors alternate along the road.
       const castle = type === 0;
-      rect(x, y - 64, 115, 64, castle ? rgb(land.mountain.map(v=>v+22)) : '#a6a1b3');
+      rect(x, y - 64, 115, 64, castle ? rgb(land.mountain.map(v=>v+22)) : '#747d8d');
       if (castle) {
-        for(let t=0;t<2;t++) { const tx=x-12+t*110; rect(tx,y-95,30,95,rgb(land.mountain.map(v=>v+12))); for(let k=0;k<3;k++)rect(tx+k*12,y-104,7,12,rgb(land.mountain.map(v=>v+12))); rect(tx+12,y-81,7,15,'#ffe0a0'); }
+        for(let t=0;t<2;t++) { const tx=x-12+t*110; rect(tx,y-95,30,95,rgb(land.mountain.map(v=>v+12))); for(let k=0;k<3;k++)rect(tx+k*12,y-104,7,12,rgb(land.mountain.map(v=>v+12))); rect(tx+12,y-81,7,15,'#b2ae99'); }
       } else polygon([[x-10,y-64],[x+55,y-102],[x+125,y-64]], '#865e79');
-      for(let k=0;k<4;k++)rect(x+12+k*26,y-49,9,14,'#ffe5ab');
+      for(let k=0;k<4;k++)rect(x+12+k*26,y-49,9,14,'#b2ae99');
       rect(x+48,y-27,20,27,'#635776');
     } else if (type === 2 || type === 5) {
       // Villages, cottages, orchards and fences.
-      for(let h=0;h<2;h++) { const hx=x+h*60; rect(hx,y-32,48,32,'#a7a1b2'); polygon([[hx-6,y-32],[hx+24,y-58],[hx+54,y-32]],h?'#966f91':'#b27468'); rect(hx+7,y-23,10,10,'#83bed2');rect(hx+29,y-21,10,21,'#765948'); }
+      for(let h=0;h<2;h++) { const hx=x+h*60; rect(hx,y-32,48,32,'#747d8d'); polygon([[hx-6,y-32],[hx+24,y-58],[hx+54,y-32]],h?'#966f91':'#b27468'); rect(hx+7,y-23,10,10,'#6f8d99');rect(hx+29,y-21,10,21,'#765948'); }
       rect(x-10,y+10,145,3,'#ecd1a1'); for(let k=0;k<7;k++)rect(x-10+k*24,y+3,3,17,'#ecd1a1');
     } else if(type===3) {
       // Windmill with slowly turning sails.
-      polygon([[x,y],[x+12,y-65],[x+40,y-65],[x+52,y]],'#e5d9ba');
-      ctx.save();ctx.translate(x+26,y-57);ctx.rotate(elapsed*0.35);for(let k=0;k<4;k++){ctx.rotate(Math.PI/2);rect(0,-3,44,6,'#796552');rect(14,-9,30,6,'#faf0d6');}ctx.restore();
-    } else if (type === 7) {
-      // Ancient standing stones and a glowing portal.
-      rect(x,y-74,20,74,'#69758d');rect(x+60,y-74,20,74,'#69758d');rect(x-5,y-86,90,15,'#8994aa');
-      polygon([[x+23,y],[x+28,y-62],[x+52,y-62],[x+57,y]],'#73dcca');
-    } else if (type === 8) {
-      // Crystal groves.
-      for(let k=0;k<4;k++)polygon([[x+k*22,y],[x+k*22-6,y-28-k*8],[x+k*22+4,y-49-k*8],[x+k*22+15,y-22],[x+k*22+12,y]],k%2?'#b99aff':'#73dcca');
+      polygon([[x,y],[x+12,y-65],[x+40,y-65],[x+52,y]],'#8e928a');
+      ctx.save();ctx.translate(x+26,y-57);ctx.rotate(elapsed*0.35);for(let k=0;k<4;k++){ctx.rotate(Math.PI/2);rect(0,-3,44,6,'#796552');rect(14,-9,30,6,'#aba99a');}ctx.restore();
     } else {
       for(let k=0;k<5;k++) rect(x+k*20,y-3,16,5, k%2?'#e1bd70':'#b3c97a');
     }
+    ctx.restore();
   });
   sceneryItems(85, 0.22, (x, i) => {
     const variation = (Math.sin(i * 4.7)+1)/2;
@@ -362,6 +357,8 @@ function drawCharacter(x, y, hero) {
   const motion = Math.sin((0.6 - jumpEffect) / 0.6 * Math.PI);
   circle(x + 18, ground + 3, 18, '#182c3655');
   ctx.save();
+  const scale = {wizard:0.8,elf:1.15,warrior:0.95,accountant:1.15}[hero];
+  ctx.translate(x+18,y+54);ctx.scale(scale,scale);ctx.translate(-x-18,-y-54);
   if (hero === 'elf' && pose) {
     const progress=1-jumpEffect/0.6;ctx.translate(x+22,y+27);
     const turns=[1,-1,2,-2,1];ctx.rotate(progress*Math.PI*2*turns[effectVariant]);
