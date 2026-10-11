@@ -1,3 +1,4 @@
+// Registration happens only after a completed run.
 (() => {
   const config = window.leaderboardConfig;
   if (!config?.url || !config?.key) return;
@@ -10,11 +11,24 @@
   const input = document.querySelector('#player-name');
   const notice = document.querySelector('#rank-notice');
   const save = document.querySelector('#save-score');
+  const restart = document.querySelector('#start');
+  const card = restart.closest('.card');
+  const menuItems = [
+    ...card.querySelectorAll('.characters, .mobile-orientation, small')
+  ];
+  const originalDisplays = menuItems.map(item => item.style.display);
 
-  let entries = null;
   let run = null;
+  let locked = false;
   let busy = false;
+
+  // Put name entry inside the game-over screen.
+  card.insertBefore(form, restart);
+  form.style.order = '2';
+  card.style.maxHeight = '100%';
+  card.style.overflowY = 'auto';
   board.hidden = false;
+  notice.hidden = true;
 
   async function rpc(name, body = {}) {
     const response = await fetch(
@@ -33,14 +47,14 @@
     return response.json();
   }
 
-  function render(data) {
-    entries = data;
+  function render(entries) {
     list.replaceChildren();
 
     entries.forEach(entry => {
       const row = document.createElement('li');
       const name = document.createElement('span');
       const points = document.createElement('strong');
+
       name.textContent = entry.player_name;
       points.textContent = Number(entry.score).toLocaleString();
       row.append(name, points);
@@ -55,135 +69,174 @@
   const ordinal = rank =>
     ['1st', '2nd', '3rd', '4th', '5th'][rank - 1];
 
-  function consider() {
-    if (!run || run.name || entries === null || busy) return;
+  function setLocked(value) {
+    locked = value;
+    restart.disabled = value;
+  }
 
-    const rank =
-      1 + entries.filter(entry => entry.score >= run.points).length;
+  function showNameForm() {
+    form.hidden = false;
+    menuItems.forEach(item => {
+      item.style.display = 'none';
+    });
+    input.focus({ preventScroll: true });
+  }
 
-    if (rank > 5 || run.points <= 0) {
-      form.hidden = true;
-      notice.hidden = true;
+  function hideNameForm() {
+    form.hidden = true;
+    menuItems.forEach((item, index) => {
+      item.style.display = originalDisplays[index];
+    });
+  }
+
+  // Space cannot bypass mandatory registration.
+  window.addEventListener('keydown', event => {
+    if (!locked || event.code !== 'Space') return;
+    if (event.target.closest('input, textarea, form')) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    if (!form.hidden) input.focus({ preventScroll: true });
+  }, true);
+
+  window.addEventListener('quest-start', () => {
+    run = {
+      id: crypto.randomUUID(),
+      finished: false,
+      points: 0,
+      saved: false
+    };
+
+    busy = false;
+    input.value = '';
+    input.setCustomValidity('');
+    save.disabled = false;
+    hideNameForm();
+    setLocked(false);
+    notice.hidden = true;
+  });
+
+  window.addEventListener('quest-end', async event => {
+    if (!run || run.finished) return;
+
+    const target = run;
+    target.finished = true;
+    target.points = event.detail.score;
+    hideNameForm();
+
+    if (target.points <= 0) return;
+
+    // Prevent restarting while the ranking is being checked.
+    setLocked(true);
+    restart.textContent = 'Checking rankings…';
+
+    try {
+      const entries = await rpc('rune_top_five');
+      if (target !== run) return;
+
+      render(entries);
+
+      const rank = 1 + entries.filter(
+        entry => entry.score >= target.points
+      ).length;
+
+      restart.textContent = 'Restart quest';
+
+      if (rank > 5) {
+        setLocked(false);
+        return;
+      }
+
+      message.textContent =
+        `Congrats! You reached the ${ordinal(rank)} highest score ` +
+        'across all players! Enter your name and register your score ' +
+        'to start a new quest.';
+
+      save.disabled = false;
+      showNameForm();
+    } catch {
+      if (target !== run) return;
+
+      // A ranking-service outage should not trap the player.
+      status.textContent =
+        'Could not check the leaderboard. You can start another quest.';
+      restart.textContent = 'Restart quest';
+      setLocked(false);
+    }
+  });
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    if (!run?.finished || run.saved || busy || form.hidden) return;
+
+    const name = input.value.trim();
+
+    if (!name || /[\x00-\x1f\x7f]/.test(name)) {
+      input.setCustomValidity('Please enter a name, not just spaces.');
+      input.reportValidity();
       return;
     }
 
-    message.textContent =
-      `Congrats! You reached the ${ordinal(rank)} highest score ` +
-      'across all players! Enter your name to register it.';
+    input.setCustomValidity('');
 
-    notice.textContent =
-      `Congrats! You’re ranked ${ordinal(rank)} — enter your name ↓`;
-
-    form.hidden = false;
-    notice.hidden = false;
-    save.disabled = false;
-  }
-
-  async function refresh(expectedRun = run) {
-    try {
-      const data = await rpc('rune_top_five');
-      if (expectedRun !== run) return;
-      render(data);
-      consider();
-    } catch {
-      status.textContent =
-        'Leaderboard temporarily unavailable. Your game can continue.';
-    }
-  }
-
-  async function submit(name, target) {
-    if (busy || target !== run) return;
+    const target = run;
     busy = true;
     save.disabled = true;
-    const points = target.points;
+    message.textContent = 'Registering your score…';
 
     try {
       const result = await rpc('rune_submit_score', {
         p_name: name,
-        p_score: points,
+        p_score: target.points,
         p_run: target.id
       });
 
       if (target !== run) return;
 
       render(result.entries);
-      target.name = name;
-      form.hidden = true;
-      notice.hidden = true;
+      target.saved = true;
+      hideNameForm();
+      setLocked(false);
 
       status.textContent = result.rank
         ? `Score registered! ${name}, you’re ranked ${ordinal(result.rank)}.`
-        : 'Another player just beat this score. ' +
-          'It no longer qualifies for the top five.';
+        : 'Another player just overtook your score. ' +
+          'You can start a new quest.';
 
-      if (target.finished && target.points > points) {
-        busy = false;
-        await submit(name, target);
-      }
+      document.querySelector('#message').textContent = status.textContent;
+      restart.focus({ preventScroll: true });
     } catch {
       if (target !== run) return;
+
       message.textContent =
         'Could not register your score. Please try again.';
-      input.value = name;
-      form.hidden = false;
     } finally {
       if (target === run) {
         busy = false;
         save.disabled = false;
       }
     }
-  }
-
-  window.addEventListener('quest-start', () => {
-    run = {
-      id: crypto.randomUUID(),
-      points: 0,
-      name: '',
-      finished: false
-    };
-    busy = false;
-    input.value = '';
-    form.hidden = true;
-    notice.hidden = true;
-    refresh(run);
-  });
-
-  window.addEventListener('quest-progress', event => {
-    if (!run) return;
-    run.points = event.detail.score;
-    consider();
-  });
-
-  window.addEventListener('quest-end', async event => {
-    if (!run) return;
-    const target = run;
-    target.points = event.detail.score;
-    target.finished = true;
-
-    if (target.name) await submit(target.name, target);
-    else await refresh(target);
-  });
-
-  form.addEventListener('submit', event => {
-    event.preventDefault();
-    if (!run || busy) return;
-
-    const name = input.value.trim();
-    if (!name) {
-      input.setCustomValidity('Please enter your name.');
-      input.reportValidity();
-      return;
-    }
-
-    input.setCustomValidity('');
-    submit(name, run);
   });
 
   input.addEventListener('input', () => input.setCustomValidity(''));
 
-  refresh();
+  async function refresh() {
+    const expected = run;
 
+    try {
+      const entries = await rpc('rune_top_five');
+      if (expected === run && !run?.finished) render(entries);
+    } catch {
+      if (expected === run && !run?.finished) {
+        status.textContent = 'Leaderboard temporarily unavailable.';
+      }
+    }
+  }
+
+  refresh();
   setInterval(() => {
-    if (run && !run.finished && !busy) refresh(run);
+    if (!run?.finished) refresh();
   }, 15000);
 })();
