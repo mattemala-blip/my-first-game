@@ -31,94 +31,155 @@
         <div>BEST<strong id="best">0</strong></div>
       </div>
 
-      <canvas id="world" width="960" height="480"
+      <canvas
+        id="world"
+        width="960"
+        height="480"
         aria-label="Your chosen hero traveling through a changing magical land."
-        tabindex="0"></canvas>
+        tabindex="0">
+      </canvas>
 
       <div class="overlay" id="overlay">
         <div class="card">
           <div class="icon">✦</div>
           <h2 id="title">Your quest awaits</h2>
-          <p class="mobile-orientation">Turn your phone in landscape mode</p>
+
+          <p class="mobile-orientation">
+            Turn your phone in landscape mode
+          </p>
+
           <p id="message">
             Leap over obstacles and collect gold.<br>
             Double jump to reach higher.
           </p>
+
           <fieldset class="characters">
             <legend>Choose your adventurer</legend>
+
             <label>
               <input type="radio" name="hero" value="wizard" checked>
               <span>🧙 Wizard</span>
             </label>
+
             <label>
               <input type="radio" name="hero" value="elf">
               <span>🏹 Elf</span>
             </label>
+
             <label>
               <input type="radio" name="hero" value="warrior">
               <span>⚔ Warrior</span>
             </label>
+
             <label>
               <input type="radio" name="hero" value="accountant">
               <span>👓 Matteo</span>
             </label>
           </fieldset>
+
           <button id="start">Start quest</button>
           <small>SPACE / CLICK / TAP · TWICE TO DOUBLE JUMP</small>
         </div>
       </div>
 
-      <a id="rank-notice" class="rank-notice"
-        href="#score-form" aria-live="polite" hidden></a>
+      <a
+        id="rank-notice"
+        class="rank-notice"
+        href="#score-form"
+        aria-live="polite"
+        hidden>
+      </a>
 
       <div id="pause-screen" class="pause-screen" hidden>
         <strong>PAUSED</strong>
       </div>
-      <button id="pause" class="pause-button" type="button"
-        aria-pressed="false" aria-controls="world" hidden>Ⅱ Pause</button>
+
+      <button
+        id="pause"
+        class="pause-button"
+        type="button"
+        aria-pressed="false"
+        aria-controls="world"
+        hidden>
+        Ⅱ Pause
+      </button>
     </section>
 
     <footer>
       <span class="coin-legend">
-        <svg class="coin-symbol" viewBox="0 0 32 32" role="img" aria-label="Coin">
+        <svg
+          class="coin-symbol"
+          viewBox="0 0 32 32"
+          role="img"
+          aria-label="Coin">
           <circle cx="16" cy="16" r="14" fill="#ffcf65"/>
           <circle cx="16" cy="16" r="9" fill="#c98732"/>
           <path d="M16 10v12" stroke="#ffe4a0" stroke-width="4"/>
         </svg>
         +50 points ·
-        <svg class="coin-symbol" viewBox="0 0 32 32" role="img" aria-label="Blue coin">
+
+        <svg
+          class="coin-symbol"
+          viewBox="0 0 32 32"
+          role="img"
+          aria-label="Blue coin">
           <circle cx="16" cy="16" r="14" fill="#78ddff"/>
           <circle cx="16" cy="16" r="9" fill="#297ac5"/>
           <path d="M16 10v12" stroke="#d8f6ff" stroke-width="4"/>
         </svg>
         +1000 points ·
-        <svg class="coin-symbol" viewBox="0 0 32 32" role="img" aria-label="Purple coin">
+
+        <svg
+          class="coin-symbol"
+          viewBox="0 0 32 32"
+          role="img"
+          aria-label="Purple coin">
           <circle cx="16" cy="16" r="14" fill="#d9a3ff"/>
           <circle cx="16" cy="16" r="9" fill="#8a45bb"/>
-          <text x="16" y="20" text-anchor="middle" fill="white"
-            font-size="11" font-weight="bold">★</text>
+          <text
+            x="16"
+            y="20"
+            text-anchor="middle"
+            fill="white"
+            font-size="11"
+            font-weight="bold">★</text>
         </svg>
         +50000 points
       </span>
+
       <span>Tip: click twice for double jump</span>
     </footer>
 
     <form id="score-form" class="score-form" hidden>
       <p id="score-message" role="status"></p>
+
       <label for="player-name">Your name</label>
-      <input id="player-name" name="player-name" maxlength="24"
-        required autocomplete="nickname">
+      <input
+        id="player-name"
+        name="player-name"
+        maxlength="24"
+        required
+        autocomplete="nickname">
+
       <button id="save-score" type="submit">Register score</button>
     </form>
 
-    <button id="music-toggle" class="music-toggle"
-      type="button" aria-pressed="true">♫ Music on</button>
+    <button
+      id="music-toggle"
+      class="music-toggle"
+      type="button"
+      aria-pressed="true">
+      ♫ Music on
+    </button>
 
-    <section id="leaderboard" class="leaderboard"
-      aria-label="Top 5 scores" hidden>
-    <h2>Top 5 scores</h2>
-    <ol id="leaderboard-list"></ol>
-    <p id="leaderboard-status" role="status">Loading scores…</p>
+    <section
+      id="leaderboard"
+      class="leaderboard"
+      aria-label="Top 5 scores"
+      hidden>
+      <h2>Top 5 scores</h2>
+      <ol id="leaderboard-list"></ol>
+      <p id="leaderboard-status" role="status">Loading scores…</p>
     </section>
 
     <p id="announcement" class="sr-only" aria-live="polite"></p>
