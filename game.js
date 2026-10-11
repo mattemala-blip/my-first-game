@@ -58,8 +58,12 @@ let best = 0;
 try { best = Number(localStorage.getItem('rune-runner-best')) || 0; } catch { /* Storage is optional. */ }
 bestLabel.textContent = best;
 
+let nextLeaderboardCheck = 0;
+
 function startGame() {
+  window.dispatchEvent(new Event('quest-start'));
   elapsed = distance = gold = score = 0;
+  nextLeaderboardCheck = 0;
   scenerySeed = (scenerySeed + 1 + Math.floor(Math.random()*1000000)) % 1000000000;
   sceneryStart = Math.random()*300000;
   paletteStart = Math.random()*75;
@@ -126,6 +130,7 @@ function endGame() {
   overlay.hidden = false;
   startButton.focus({ preventScroll: true });
   document.querySelector('#announcement').textContent = `Game over. Score ${score}. Restart quest to play again.`;
+  window.dispatchEvent(new CustomEvent('quest-end', { detail: { score } }));
 }
 function togglePause() {
   if (state !== 'playing' && state !== 'paused') return;
@@ -144,7 +149,7 @@ startButton.addEventListener('click', startGame);
 canvas.addEventListener('pointerdown', event => { event.preventDefault(); jump(); });
 document.addEventListener('keydown', event => {
   if (event.code !== 'Space' || event.repeat) return;
-  if (event.target === pauseButton) return;
+  if (event.target === pauseButton || event.target.closest('input, form, .leaderboard')) return;
   if (state !== 'playing' && event.target.closest('.characters')) return;
   event.preventDefault();
   if (state === 'playing') jump(); else if (state !== 'paused') startGame();
@@ -232,6 +237,10 @@ function update(dt) {
   particles = particles.filter(p => { p.x += p.vx * dt; p.y += p.vy * dt; if (p.effect === 'accountant') p.vy += 420 * dt; p.life -= dt; return p.life > 0; });
   score = Math.floor(distance / 12) + gold * 50 + bonusScore;
   scoreLabel.textContent = score;
+  if (elapsed >= nextLeaderboardCheck) {
+    nextLeaderboardCheck = elapsed + 1;
+    window.dispatchEvent(new CustomEvent('quest-progress', { detail: { score } }));
+  }
   const commentInterval = complaintCountAt(elapsed);
   if (commentInterval > lastCommentInterval) {
     lastCommentInterval = commentInterval;
