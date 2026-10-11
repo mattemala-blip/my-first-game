@@ -491,7 +491,7 @@ function drawCharacter(x, y, hero) {
     ctx.save();ctx.translate(x+8,y+30);ctx.rotate(pose?move.shield:0);ctx.translate(-5,7);
     circle(0,0,13,'#7c8fa9');circle(0,0,8,'#ebc872');ctx.restore();
   } else {
-    rect(x + 7, y + 7, 28, 9, '#5b3f35'); rect(x + 17, y + 28, 8, 19, '#f4f0e5'); rect(x + 20, y + 31, 3, 14, '#ef8a9e');
+    rect(x + 7, y + 7, 28, 9, '#5b3f35'); rect(x + 17, y + 28, 8, 19, '#f4f0e5'); rect(x + 20, y + 31, 3, 14, '#9b59d0');
     // Two visible pupils inside two lenses.
     rect(x+14,y+19,5,5,'#ffffff');rect(x+26,y+19,5,5,'#ffffff');
     rect(x+16,y+20,2,3,'#192338');rect(x+28,y+20,2,3,'#192338');
